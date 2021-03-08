@@ -1,0 +1,8 @@
+/home/danielconde/Desktop/B3/B3a/CMakeFiles/install/strip.dir
+/home/danielconde/Desktop/B3/B3a/CMakeFiles/install/local.dir
+/home/danielconde/Desktop/B3/B3a/CMakeFiles/B3a.dir
+/home/danielconde/Desktop/B3/B3a/CMakeFiles/rebuild_cache.dir
+/home/danielconde/Desktop/B3/B3a/CMakeFiles/list_install_components.dir
+/home/danielconde/Desktop/B3/B3a/CMakeFiles/exampleB3a.dir
+/home/danielconde/Desktop/B3/B3a/CMakeFiles/edit_cache.dir
+/home/danielconde/Desktop/B3/B3a/CMakeFiles/install.dir

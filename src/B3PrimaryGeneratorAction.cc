@@ -76,11 +76,13 @@ void B3PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     G4int Z = 50, A = 100;
     G4double ionCharge   = Z*eplus;
     G4double excitEnergy = 0.*keV;
-    
+    G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+    G4ParticleDefinition* e
+                    = particleTable->FindParticle("e+");
     G4ParticleDefinition* ion
        = G4IonTable::GetIonTable()->GetIon(Z,A,excitEnergy);
-    fParticleGun->SetParticleDefinition(ion);
-    fParticleGun->SetParticleCharge(ionCharge);
+    fParticleGun->SetParticleDefinition(ion);//ion);
+    fParticleGun->SetParticleCharge(+Z*eplus);
   }
 
   // randomized position
@@ -92,9 +94,17 @@ void B3PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   x0 += dx0*(G4UniformRand()-0.5);
   y0 += dy0*(G4UniformRand()-0.5);
   z0 += dz0*(G4UniformRand()-0.5);
-  fParticleGun->SetParticlePosition(G4ThreeVector(0,0,200*mm));
-  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,-1.));
-  fParticleGun->SetParticleEnergy(10*GeV);
+  fParticleGun->SetParticlePosition(G4ThreeVector(0,0,26.8*mm));//200*mm));//
+  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,-1.));//(0.,0.,-1.));//
+  G4double rdenergy = 1*MeV;
+  //for(;;){
+  //  rdenergy = 2*MeV*G4UniformRand();
+  //  bool result = G4BetaFunction(0,2*MeV,rdenergy,1,49);
+  //  if(true == result){
+  //    break;
+  //  }
+  //}
+  fParticleGun->SetParticleEnergy(rdenergy);
   //create vertex
   //
   fParticleGun->GeneratePrimaryVertex(anEvent);

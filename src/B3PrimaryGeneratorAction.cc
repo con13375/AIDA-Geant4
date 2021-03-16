@@ -73,16 +73,16 @@ void B3PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   G4ParticleDefinition* particle = fParticleGun->GetParticleDefinition();
   if (particle == G4ChargedGeantino::ChargedGeantino()) {
     //fluorine 
-    G4int Z = 50, A = 100;
-    G4double ionCharge   = Z*eplus;
-    G4double excitEnergy = 0.*keV;
+    //G4int Z = 50, A = 100;
+    //G4double ionCharge   = Z*eplus;
+    //G4double excitEnergy = 0.*keV;
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-    G4ParticleDefinition* e
+    G4ParticleDefinition* positron
                     = particleTable->FindParticle("e+");
-    G4ParticleDefinition* ion
-       = G4IonTable::GetIonTable()->GetIon(Z,A,excitEnergy);
-    fParticleGun->SetParticleDefinition(ion);//ion);
-    fParticleGun->SetParticleCharge(+Z*eplus);
+    //G4ParticleDefinition* ion
+    //   = G4IonTable::GetIonTable()->GetIon(Z,A,excitEnergy);
+    fParticleGun->SetParticleDefinition(positron);//positron);
+    //fParticleGun->SetParticleCharge(+Z*eplus);
   }
 
   // randomized position
@@ -96,7 +96,7 @@ void B3PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   z0 += dz0*(G4UniformRand()-0.5);
   fParticleGun->SetParticlePosition(G4ThreeVector(0,0,26.8*mm));//200*mm));//
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,-1.));//(0.,0.,-1.));//
-  G4double rdenergy = 1*MeV;
+  G4double rdenergy = 1.7*MeV;
   //for(;;){
   //  rdenergy = 2*MeV*G4UniformRand();
   //  bool result = G4BetaFunction(0,2*MeV,rdenergy,1,49);

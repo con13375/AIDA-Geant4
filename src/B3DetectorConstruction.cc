@@ -132,19 +132,20 @@ G4VPhysicalVolume* B3DetectorConstruction::Construct()
 
   // plaque stuff
   //G4double plaqueVol_XY = 47.5*mm, plaqueVol_Z = 0.8*mm; // empty space mother of plaque, i regret doing this
-  G4double DDSD_XY = 4*cm, DDSD_Z = 0.5*mm;
+  G4double DDSD_XY = 4*cm, DDSD_Z = 0.5*mm; //including inactive area
+  G4double detector_XY = 3.815*cm; // just active area
   G4double Plastic_XY = 4.75*cm, Plastic_Z = 0.8*mm;
 
   G4double bit_size = 1.27*mm;
   G4double connector_dx = (bit_size*34+1.55)/2*mm, connector_dy = 2.36*mm, connector_dz = 2.39*mm;
   G4double chole1_dx = (bit_size*34)/2*mm, chole1_dy = connector_dy, chole1_dz = connector_dz-bit_size/2;
   G4double chole2_dx = (bit_size*26)/2*mm, chole2_dy = connector_dy, chole2_dz = connector_dz;
-  G4double c_bits_dx = bit_size-0.05*mm, c_bits_dy = 1.255*mm, c_bits_dz = chole1_dz;
+  G4double c_bits_dx = 0.47*bit_size, c_bits_dy = (1.105+1.255)*mm, c_bits_dz = chole1_dz;
 
   G4double c_copper1_XZ = 0.3*mm;
   G4double c_copper1_Y = connector_dy+3*c_copper1_XZ; //upper
   G4double c_copper2_XZ = c_copper1_XZ;
-  G4double c_copper2_Y = connector_dy+1.5*c_copper1_XZ;  //lower
+  G4double c_copper2_Y = connector_dy+1*c_copper1_XZ;  //lower
   G4double c_copper3_XY = c_copper1_XZ;
   G4double c_copper3_Z = 0.5*(connector_dz+bit_size/2+c_copper1_XZ);
   G4double c_copper4_XY = c_copper1_XZ;
@@ -156,8 +157,8 @@ G4VPhysicalVolume* B3DetectorConstruction::Construct()
 
   // kapton stuff
   G4double kapton_Y = 0.1*mm;
-  G4double cu_X = 0.1*mm, cu_Y = 0.018*mm, cu_sep = 0.635*mm;
-  G4int n_cu = 0; // this should be 68, but i put it lower while building to ease loading time
+  G4double cu_X = 0.15*mm, cu_Y = 0.009*mm, cu_sep = 0.635*mm;
+  G4int n_cu = 68; // this should be 68, but i put it lower while building to ease loading time
 
   // tubes, separators and bolts
   G4double tube_in = 0.825*mm, tube_out = 1.5*mm, tube_Z = 0.9*world_sizeZ;
@@ -186,6 +187,21 @@ G4VPhysicalVolume* B3DetectorConstruction::Construct()
   a = 28.0855*g/mole;
   G4Element* elSi  = new G4Element("Silicon"  ,"Si" , 14., a);
 
+//  a = 65.38*g/mole;
+//  G4Element* elZn  = new G4Element("Zinc"  ,"Zn" , 12., a);
+//
+//  a = 118.710*g/mole;
+//  G4Element* elSn  = new G4Element("Tin"  ,"Sn" , 50., a);
+//
+//  a = 55.845*g/mole;
+//  G4Element* elFe  = new G4Element("Iron"  ,"Fe" , 26., a);
+//
+//  a = 30.973*g/mole;
+//  G4Element* elP  = new G4Element("Phosphorus"  ,"P" , 15., a);
+//
+//  a = 65.546*g/mole;
+//  G4Element* elCu  = new G4Element("Copper"  ,"Cu" , 29., a);
+
   //G4NistManager* nist = G4NistManager::Instance();
   //G4Material* default_mat = nist->FindOrBuildMaterial("G4_AIR");
   G4Material* DDSD_mat = nist->FindOrBuildMaterial("G4_Si");
@@ -213,18 +229,30 @@ G4VPhysicalVolume* B3DetectorConstruction::Construct()
   G4Material* Epoxy = new G4Material("Epoxy" , density, nel);
   Epoxy->AddElement(elH, 2);
   Epoxy->AddElement(elC, 2); 
+
   //SiO2 (Quarz)
   density= 2.200*g/cm3;
   nel = 2;
   G4Material* SiO2 =  new G4Material("SiO2",density, nel);
   SiO2->AddElement(elSi, 1); 
-  SiO2->AddElement(elO , 2);  
+  SiO2->AddElement(elO , 2); 
+ 
   //FR4 (Glass + Epoxy)  
   density = 1.86*g/cm3; 
   nel = 2;
   G4Material* FR4 = new G4Material("FR4"  , density, nel); 
-  FR4->AddMaterial(Epoxy, 0.472*perCent); 
-  FR4->AddMaterial(SiO2, 0.528*perCent);
+  FR4->AddMaterial(Epoxy, 47.2*perCent); 
+  FR4->AddMaterial(SiO2, 52.8*perCent);
+
+  //Phosphor Bronze
+  density = 8.86*g/cm3; //unverified
+  nel = 5;
+  G4Material* PBronze = new G4Material("FR4"  , density, nel); 
+  PBronze->AddMaterial(nist->FindOrBuildMaterial("G4_Zn"), 9.9*perCent);
+  PBronze->AddMaterial(nist->FindOrBuildMaterial("G4_Sn"), 2.2*perCent);
+  PBronze->AddMaterial(nist->FindOrBuildMaterial("G4_Fe"), 1.9*perCent);
+  PBronze->AddMaterial(nist->FindOrBuildMaterial("G4_P"), 0.03*perCent);
+  PBronze->AddMaterial(nist->FindOrBuildMaterial("G4_Cu"), 85.97*perCent);
 
   G4Material* mat_tubes = nist->FindOrBuildMaterial("G4_Ti");
 
@@ -269,28 +297,27 @@ G4VPhysicalVolume* B3DetectorConstruction::Construct()
     //std::cout << itubes << std::endl;
 
     // separators
-    if (itubes%2==0){
-      for (G4int isep = 0; isep < nb_plaques; isep++){
-        G4ThreeVector z_i = G4ThreeVector(0,0, AIDA_nose_Z-(1.5+isep)*(separation+2*Plastic_Z));
+    for (G4int isep = 0; isep < nb_plaques + 1; isep++){ //nb_plaques has a +1 to put the other endstops
+      if(isep == 0 or isep == nb_plaques){ // if end or start, put end stops
+        G4int inv = std::cos(pi*isep/nb_plaques); // if at end, this is -1, and rotates and translates accordingly
+        G4int oneOrzero = std::cos(pi*isep/nb_plaques/2); // if at end, this is 0, and places at correct plaque
+        G4ThreeVector z_i = G4ThreeVector(0,0, AIDA_nose_Z+inv*Plastic_Z+inv*bolt_Z2-(oneOrzero+isep)*(separation+2*Plastic_Z));
+        G4RotationMatrix* boltRot = new G4RotationMatrix;
+        boltRot -> rotateY(pi*isep/nb_plaques);
+        G4ThreeVector position_bolt = position+z_i;
+        //std::cout << itubes%2 << std::endl;
+        //std::cout << position_bolt << std::endl;
+        new G4PVPlacement(yRot,position_bolt+inv*G4ThreeVector(nut_Z-bolt_R3,0,-0.85), logic_nut, "nut",
+	  logicWorld, false, 2*itubes+isep, fCheckOverlaps);
+        new G4PVPlacement(boltRot,position_bolt, logic_bolt, "bolt", logicWorld, false, 2*itubes+isep, fCheckOverlaps);
+      }
+      else{ //otherwise, put separators in between
+        G4ThreeVector z_i = G4ThreeVector(0,0, AIDA_nose_Z-(0.5+isep)*(separation+2*Plastic_Z));
         G4ThreeVector position_sep = position+z_i;
         //std::cout << itubes%2+10 << std::endl;
         //std::cout << position_sep << std::endl;
         new G4PVPlacement(0,position_sep, logic_separator, "separator", logicWorld, false,2*itubes+isep, fCheckOverlaps);
       }
-    }
-    // bolts and nuts
-    if (itubes%2==1){
-      for (G4int ibolt = 0; ibolt < nb_plaques; ibolt++){
-        G4ThreeVector z_i = G4ThreeVector(0,0, AIDA_nose_Z+Plastic_Z+bolt_Z2-(1+ibolt)*(separation+2*Plastic_Z));
-        G4ThreeVector position_bolt = position+z_i;
-        //std::cout << itubes%2 << std::endl;
-        //std::cout << position_bolt << std::endl;
-        new G4PVPlacement(yRot,position_bolt+G4ThreeVector(nut_Z-bolt_R3,0,-0.85), logic_nut, "nut",
-			  logicWorld, false, 2*itubes+ibolt, fCheckOverlaps);
-        new G4PVPlacement(0,position_bolt, logic_bolt, "bolt", logicWorld, false, 2*itubes+ibolt, fCheckOverlaps);
-      }
-    }
-    if (itubes%4==2){
     }
     new G4PVPlacement(0,position, logic_tube, "tube", logicWorld, false, itubes, fCheckOverlaps);
   }
@@ -299,11 +326,14 @@ G4VPhysicalVolume* B3DetectorConstruction::Construct()
   // solids
   //G4Box* plaqueVol = new G4Box("plaqueVol", plaqueVol_XY, plaqueVol_XY, plaqueVol_Z);
   G4Box* DDSD = new G4Box("DDSD",DDSD_XY,DDSD_XY,DDSD_Z);
-  G4Box* hole = new G4Box("hole",DDSD_XY,DDSD_XY,Plastic_Z);
+  G4Box* hole1 = new G4Box("hole",DDSD_XY,DDSD_XY,DDSD_Z); // this hole is where the silicon is placed
+  G4Box* hole2 = new G4Box("hole",detector_XY,detector_XY,2*Plastic_Z); // this deep hole is where the active silicon is
 
-//  G4double mainPlastic_XY = Plastic_XY-3*tube_out, miniPlastic_XY = 1.5*tube_out;
   G4Box* Plastic = new G4Box("Plastic", Plastic_XY, Plastic_XY, Plastic_Z);
-  G4SubtractionSolid* plastic1 = new G4SubtractionSolid("plastic1", Plastic, hole); //silicon detector hole
+
+  G4ThreeVector detector_spot(0,0,Plastic_Z-DDSD_Z); // placed just at the surface of the plastic
+  G4SubtractionSolid* plastic0 = new G4SubtractionSolid("plastic0", Plastic, hole1, 0, detector_spot); //silicon detector spot
+  G4SubtractionSolid* plastic1 = new G4SubtractionSolid("plastic1", plastic0, hole2); //silicon detector hole
   // perforing four holes in the borders of the plastic for the titanium tube to go through
   G4Tubs* solid_tubes = new G4Tubs("tubes", 0, 1.05*tube_out, 1.05*Plastic_Z, 0, twopi);
   G4double th = tube_pos_XY;
@@ -322,6 +352,7 @@ G4VPhysicalVolume* B3DetectorConstruction::Construct()
   G4SubtractionSolid* connector2 = new G4SubtractionSolid("connector", connector1, chole_1);
   G4SubtractionSolid* connector = new G4SubtractionSolid("connector", connector2, chole_2);
 
+// Naming these copper was a mistake because they're actually phosphor bronze
   G4Box* c_copper1 = new G4Box("c_copper1", c_copper1_XZ, c_copper1_Y, c_copper1_XZ);
   G4Box* c_copper2 = new G4Box("c_copper2", c_copper2_XZ, c_copper2_Y, c_copper2_XZ);
   G4Box* c_copper3 = new G4Box("c_copper3", c_copper3_XY, c_copper3_XY, c_copper3_Z);
@@ -342,10 +373,10 @@ G4VPhysicalVolume* B3DetectorConstruction::Construct()
 //  G4LogicalVolume* logic_lateralplastic = new G4LogicalVolume(lateralplastic, FR4, "plastic");
   G4LogicalVolume* logic_connector = new G4LogicalVolume(connector, LCP, "connector");
   G4LogicalVolume* logic_bit = new G4LogicalVolume(connector_bit, LCP, "bit");
-  G4LogicalVolume* logic_copper1 = new G4LogicalVolume(c_copper1, Cu, "Cu1");
-  G4LogicalVolume* logic_copper2 = new G4LogicalVolume(c_copper2, Cu, "Cu2");
-  G4LogicalVolume* logic_copper3 = new G4LogicalVolume(c_copper3, Cu, "Cu3");
-  G4LogicalVolume* logic_copper4 = new G4LogicalVolume(c_copper4, Cu, "Cu4");
+  G4LogicalVolume* logic_copper1 = new G4LogicalVolume(c_copper1, PBronze, "Cu1");
+  G4LogicalVolume* logic_copper2 = new G4LogicalVolume(c_copper2, PBronze, "Cu2");
+  G4LogicalVolume* logic_copper3 = new G4LogicalVolume(c_copper3, PBronze, "Cu3");
+  G4LogicalVolume* logic_copper4 = new G4LogicalVolume(c_copper4, PBronze, "Cu4");
 
   // Assembling plaque
   G4double Z = 0;
@@ -360,7 +391,7 @@ G4VPhysicalVolume* B3DetectorConstruction::Construct()
 
     G4ThreeVector plaque_center = dZ_3V;
     std::cout << G4ThreeVector(0,0,Z)+dZ_3V << std::endl;
-    new G4PVPlacement(0,G4ThreeVector(0,0,Z)+dZ_3V,logic_DDSD,"DDSD",
+    new G4PVPlacement(0,G4ThreeVector(0,0,Z)+dZ_3V+detector_spot,logic_DDSD,"DDSD",
 			logicWorld,false,iplaque,fCheckOverlaps);
     new G4PVPlacement(0,G4ThreeVector(0,0,Z)+dZ_3V,logic_plastic,"plastic",
 			logicWorld,false,iplaque,fCheckOverlaps);
@@ -371,10 +402,18 @@ G4VPhysicalVolume* B3DetectorConstruction::Construct()
       G4double kapton_Z = 0.5*(world_sizeZ+dZ);
       G4Box* strip = new G4Box("kapton", connector_dx, kapton_Y, kapton_Z);
       G4LogicalVolume* logic_strip = new G4LogicalVolume(strip, Kapton, "kapton");
-      
+  
+      G4Colour kapton_brown(0.6, 0.2, 0.2);
+      G4VisAttributes* kapton_color = new G4VisAttributes(kapton_brown);
+      logic_strip -> SetVisAttributes(kapton_color);
+
       // Cu strips in kapton
       G4Box* cu_strip = new G4Box("cu_strip", cu_X, cu_Y, kapton_Z);
       G4LogicalVolume* logic_cu_strip = new G4LogicalVolume(cu_strip, Cu, "cu_strip");
+
+      G4Colour copper_brown(0.4, 0.15, 0.15);
+      G4VisAttributes* copper_color = new G4VisAttributes(copper_brown);
+      logic_cu_strip -> SetVisAttributes(copper_color);
 
       G4RotationMatrix rotm = G4RotationMatrix();
       rotm.rotateZ(-iconn*pi/2);
@@ -395,11 +434,11 @@ G4VPhysicalVolume* B3DetectorConstruction::Construct()
         G4ThreeVector position_cu = position_kapton+x*(kapton_Y+cu_Y)+y*(-n_cu*0.5*cu_sep+icu*cu_sep);
         G4Transform3D transform_cu = G4Transform3D(rotm,position_cu);
         //std::cout<<position_cu<<std::endl;
-        new G4PVPlacement(transform_cu, logic_cu_strip, "cu_strip", logicWorld, false, 4*68*iplaque+n_cu*iconn+icu, fCheckOverlaps);
+        new G4PVPlacement(transform_cu, logic_cu_strip, "cu_strip", logicWorld, false, 4*n_cu*iplaque+n_cu*iconn+icu, fCheckOverlaps);
       }
       
       // Putting 34 connector bits
-      G4int n_bits = 34;
+      G4int n_bits = n_cu/2;
       for (G4int ibit = 0; ibit < n_bits; ibit++) {
         G4double bit_dX = -n_bits*0.5*bit_size+ibit*bit_size;
         G4ThreeVector position_bit = bit_dX*y+position;
@@ -548,6 +587,34 @@ G4VPhysicalVolume* B3DetectorConstruction::Construct()
   //
   logicRing->SetVisAttributes (G4VisAttributes::GetInvisible());
   logicDetector->SetVisAttributes (G4VisAttributes::GetInvisible());    
+  logicWorld->SetVisAttributes (G4VisAttributes::GetInvisible());   
+  logicCryst->SetVisAttributes (G4VisAttributes::GetInvisible()); 
+  logicPatient->SetVisAttributes (G4VisAttributes::GetInvisible()); 
+
+  // Colors
+  G4Colour gray_black(0.2, 0.2, 0.2);
+  G4VisAttributes* connector_color = new G4VisAttributes(gray_black);
+  logic_connector -> SetVisAttributes(connector_color);
+  logic_bit -> SetVisAttributes(connector_color);
+
+//  G4Colour gray_black(0.2, 0.2, 0.2);
+  G4VisAttributes* tube_color = new G4VisAttributes(gray_black);
+  logic_tube -> SetVisAttributes(tube_color);
+
+  G4Colour light_blue(0.7,0.7,1);
+  G4VisAttributes* detector_color = new G4VisAttributes(light_blue);
+  logic_DDSD -> SetVisAttributes(detector_color);
+
+  G4Colour bronze(141./256,108./256,41./256);
+  G4VisAttributes* bronze_color = new G4VisAttributes(bronze);
+  logic_copper1 -> SetVisAttributes(bronze_color);
+  logic_copper2 -> SetVisAttributes(bronze_color);
+  logic_copper3 -> SetVisAttributes(bronze_color);
+  logic_copper4 -> SetVisAttributes(bronze_color);
+
+  G4Colour pcb_Green(0,153./256,77./256);
+  G4VisAttributes* plastic_color = new G4VisAttributes(pcb_Green);
+  logic_plastic -> SetVisAttributes(plastic_color);
 
   // Print materials
   G4cout << *(G4Material::GetMaterialTable()) << G4endl; 

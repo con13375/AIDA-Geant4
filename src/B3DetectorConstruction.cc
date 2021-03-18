@@ -29,6 +29,10 @@
 
 #include "B3DetectorConstruction.hh"
 
+#include <chrono>
+#include <random>       
+// std::uniform_int_distribution<int> distrib(a, b)
+
 #include "G4UnionSolid.hh"
 #include "G4SubtractionSolid.hh"
 #include "G4NistManager.hh"
@@ -158,7 +162,7 @@ G4VPhysicalVolume* B3DetectorConstruction::Construct()
   // kapton stuff
   G4double kapton_Y = 0.1*mm;
   G4double cu_X = 0.15*mm, cu_Y = 0.009*mm, cu_sep = 0.635*mm;
-  G4int n_cu = 68; // this should be 68, but i put it lower while building to ease loading time
+  G4int n_cu = 4; // this should be 68, but i put it lower while building to ease loading time
 
   // tubes, separators and bolts
   G4double tube_in = 0.825*mm, tube_out = 1.5*mm, tube_Z = 0.9*world_sizeZ;
@@ -379,6 +383,7 @@ G4VPhysicalVolume* B3DetectorConstruction::Construct()
   // Assembling plaque
   G4double Z = 0;
   G4double Z2 = connector_dz+Plastic_Z;
+  std::cout << DDSD_Z << std::endl;
   for (G4int iplaque = 0; iplaque < nb_plaques ; iplaque++) {
     
     G4double dZ = AIDA_nose_Z-(1+iplaque)*(separation+2*Plastic_Z);
@@ -388,7 +393,7 @@ G4VPhysicalVolume* B3DetectorConstruction::Construct()
     //std::cout << dZ << std::endl;
 
     G4ThreeVector plaque_center = dZ_3V;
-    std::cout << G4ThreeVector(0,0,Z)+dZ_3V << std::endl;
+    //std::cout << G4ThreeVector(0,0,Z)+dZ_3V+detector_spot << std::endl;
     new G4PVPlacement(0,G4ThreeVector(0,0,Z)+dZ_3V+detector_spot,logic_DDSD,"DDSD",
 			logicWorld,false,iplaque,fCheckOverlaps);
     new G4PVPlacement(0,G4ThreeVector(0,0,Z)+dZ_3V,logic_plastic,"plastic",
@@ -615,8 +620,8 @@ G4VPhysicalVolume* B3DetectorConstruction::Construct()
   G4VisAttributes* plastic_color = new G4VisAttributes(pcb_Green);
   logic_plastic -> SetVisAttributes(plastic_color);
 
-  // Print materials
-  G4cout << *(G4Material::GetMaterialTable()) << G4endl; 
+  // Print header
+  std::cout << "plaque_nb" << "," << "energy(MeV)" << "," << "x(mm)" << "," << "y(mm)" << "," << "z(mm)" << "," << "px" << "," << "py" << "," << "pz" << std::endl;
 
   //always return the physical World
   //

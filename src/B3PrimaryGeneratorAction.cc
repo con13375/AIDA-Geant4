@@ -155,7 +155,7 @@ void B3PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     }
   }
 
-  std::uniform_int_distribution<int> lucky(0, arr.size());
+  std::uniform_int_distribution<int> lucky(0, arr.size());  // which plaque is getting the beta
 
   G4double rdenergy = arr.at(lucky(generator));
   //for(;;){

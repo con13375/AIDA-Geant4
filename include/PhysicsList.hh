@@ -24,33 +24,28 @@
 // ********************************************************************
 //
 //
-/// \file B3aRunAction.hh
-/// \brief Definition of the B3aRunAction class
+/// \file PhysicsList.hh
+/// \brief Definition of the PhysicsList class
 
-#ifndef B3aRunAction_h
-#define B3aRunAction_h 1
+#ifndef PhysicsList_h
+#define PhysicsList_h 1
 
-#include "G4UserRunAction.hh"
-#include "G4Accumulable.hh"
-#include "globals.hh"
+#include "G4VModularPhysicsList.hh"
 
-/// Run action class
+/// Modular physics list
+///
+/// It includes the folowing physics builders
+/// - G4DecayPhysics
+/// - G4RadioactiveDecayPhysics
+/// - G4EmStandardPhysics
 
-class B3aRunAction : public G4UserRunAction
+class PhysicsList: public G4VModularPhysicsList
 {
-  public:
-    B3aRunAction();
-    virtual ~B3aRunAction();
-    
-    virtual void BeginOfRunAction(const G4Run*);
-    virtual void   EndOfRunAction(const G4Run*);
+public:
+  PhysicsList();
+  virtual ~PhysicsList();
 
-    void CountEvent()           { fGoodEvents += 1; };
-    void SumDose(G4double dose) { fSumDose += dose; };  
-
-private:
-    G4Accumulable<G4int>    fGoodEvents;
-    G4Accumulable<G4double> fSumDose;  
+  virtual void SetCuts();
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

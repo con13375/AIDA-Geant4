@@ -24,28 +24,44 @@
 // ********************************************************************
 //
 //
-/// \file B3aActionInitialization.hh
-/// \brief Definition of the B3aActionInitialization class
+/// \file EventAction.hh
+/// \brief Definition of the EventAction class
 
-#ifndef B3aActionInitialization_h
-#define B3aActionInitialization_h 1
+#ifndef EventAction_h
+#define EventAction_h 1
 
-#include "G4VUserActionInitialization.hh"
+#include "G4UserEventAction.hh"
+#include "globals.hh"
 
-/// Action initialization class.
+class RunAction;
+
+/// Event action class
 ///
+/// In EndOfEventAction() there is collected information event per event 
+/// from Hits Collections, and accumulated statistic for 
+/// RunAction::EndOfRunAction().
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-class B3aActionInitialization : public G4VUserActionInitialization
+class EventAction : public G4UserEventAction
 {
   public:
-    B3aActionInitialization();
-    virtual ~B3aActionInitialization();
+    EventAction(RunAction* runAction);
+    virtual ~EventAction(); 
 
-    virtual void BuildForMaster() const;
-    virtual void Build() const;
-
+    virtual void  BeginOfEventAction(const G4Event*); //virtual
+    virtual void    EndOfEventAction(const G4Event*); //virtual
+    void addEdep(G4double Edep);          
+    void addEdep2(G4double Edep);    
+    void addEdep3(G4double Edep);
+    
+  private:
+    RunAction*  fRunAction;
+    G4double                  TotalEnergyDeposit_1;
+    G4double                  TotalEnergyDeposit_2;
+    G4double                  TotalEnergyDeposit_3;
+    G4double                  Beta_total;
+    G4double                  Beta_total_w;
+    G4int fCollID_cryst;
+    G4int fCollID_patient;   
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

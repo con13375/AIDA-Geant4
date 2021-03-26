@@ -24,28 +24,27 @@
 // ********************************************************************
 //
 //
-/// \file B3PhysicsList.hh
-/// \brief Definition of the B3PhysicsList class
+/// \file StackingAction.hh
+/// \brief Definition of the StackingAction class
 
-#ifndef B3PhysicsList_h
-#define B3PhysicsList_h 1
+#ifndef StackingAction_h
+#define StackingAction_h 1
 
-#include "G4VModularPhysicsList.hh"
+#include "G4UserStackingAction.hh"
+#include "globals.hh"
 
-/// Modular physics list
+/// Stacking action class : manage the newly generated particles
 ///
-/// It includes the folowing physics builders
-/// - G4DecayPhysics
-/// - G4RadioactiveDecayPhysics
-/// - G4EmStandardPhysics
+/// One wishes do not track secondary neutrino.Therefore one kills it 
+/// immediately, before created particles will  put in a stack.
 
-class B3PhysicsList: public G4VModularPhysicsList
+class StackingAction : public G4UserStackingAction
 {
-public:
-  B3PhysicsList();
-  virtual ~B3PhysicsList();
-
-  virtual void SetCuts();
+  public:
+    StackingAction();
+    virtual ~StackingAction();
+     
+    virtual G4ClassificationOfNewTrack ClassifyNewTrack(const G4Track*);        
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

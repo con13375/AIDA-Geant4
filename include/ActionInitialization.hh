@@ -24,36 +24,28 @@
 // ********************************************************************
 //
 //
-/// \file B3aEventAction.hh
-/// \brief Definition of the B3aEventAction class
+/// \file ActionInitialization.hh
+/// \brief Definition of the ActionInitialization class
 
-#ifndef B3aEventAction_h
-#define B3aEventAction_h 1
+#ifndef ActionInitialization_h
+#define ActionInitialization_h 1
 
-#include "G4UserEventAction.hh"
-#include "globals.hh"
+#include "G4VUserActionInitialization.hh"
 
-class B3aRunAction;
-
-/// Event action class
+/// Action initialization class.
 ///
-/// In EndOfEventAction() there is collected information event per event 
-/// from Hits Collections, and accumulated statistic for 
-/// B3RunAction::EndOfRunAction().
 
-class B3aEventAction : public G4UserEventAction
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+class ActionInitialization : public G4VUserActionInitialization
 {
   public:
-    B3aEventAction(B3aRunAction* runAction);
-    virtual ~B3aEventAction();
+    ActionInitialization();
+    virtual ~ActionInitialization();
 
-    virtual void  BeginOfEventAction(const G4Event*);
-    virtual void    EndOfEventAction(const G4Event*);
-    
-  private:
-    B3aRunAction*  fRunAction;
-    G4int fCollID_cryst;
-    G4int fCollID_patient;   
+    virtual void BuildForMaster() const;
+    virtual void Build() const;
+
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -24,11 +24,11 @@
 // ********************************************************************
 //
 //
-/// \file B3DetectorConstruction.hh
-/// \brief Definition of the B3DetectorConstruction class
+/// \file DetectorConstruction.hh
+/// \brief Definition of the DetectorConstruction class
 
-#ifndef B3DetectorConstruction_h
-#define B3DetectorConstruction_h 1
+#ifndef DetectorConstruction_h
+#define DetectorConstruction_h 1
 
 #include "G4VUserDetectorConstruction.hh"
 #include "globals.hh"
@@ -41,15 +41,14 @@ class G4LogicalVolume;
 /// Crystals are positioned in Ring, with an appropriate rotation matrix. 
 /// Several copies of Ring are placed in the full detector.
 
-class B3DetectorConstruction : public G4VUserDetectorConstruction
+class DetectorConstruction : public G4VUserDetectorConstruction
 {
   public:
-    B3DetectorConstruction();
-    virtual ~B3DetectorConstruction();
+    DetectorConstruction();
+    virtual ~DetectorConstruction();
 
   public:
     virtual G4VPhysicalVolume* Construct();
-    virtual void ConstructSDandField();
                
   private:
     void DefineMaterials();

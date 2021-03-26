@@ -24,39 +24,43 @@
 // ********************************************************************
 //
 //
-/// \file B3PrimaryGeneratorAction.hh
-/// \brief Definition of the B3PrimaryGeneratorAction class
+/// \file RunAction.hh
+/// \brief Definition of the RunAction class
 
-#ifndef B3PrimaryGeneratorAction_h
-#define B3PrimaryGeneratorAction_h 1
+#ifndef RunAction_h
+#define RunAction_h 1
 
-#include "G4VUserPrimaryGeneratorAction.hh"
-#include "G4ParticleGun.hh"
+#include "G4UserRunAction.hh"
+#include "G4Accumulable.hh"
 #include "globals.hh"
 
-class G4ParticleGun;
-class G4Event;
+/// Run action class
 
-/// The primary generator action class with particle gum.
-///
-/// It defines an ion (F18), at rest, randomly distribued within a zone 
-/// in a patient defined in GeneratePrimaries(). Ion F18 can be changed 
-/// with the G4ParticleGun commands (see run2.mac).
-
-class B3PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
+class RunAction : public G4UserRunAction
 {
   public:
-    B3PrimaryGeneratorAction();    
-    virtual ~B3PrimaryGeneratorAction();
+    RunAction();
+    virtual ~RunAction(); //virtual
+    
+    virtual void BeginOfRunAction(const G4Run*); //virtual
+    virtual void   EndOfRunAction(const G4Run*); //virtual
 
-    virtual void GeneratePrimaries(G4Event*);         
+    void CountEvent()           { fGoodEvents += 1; };
+    void SumDose(G4double dose) { fSumDose += dose; };  
 
-    const G4ParticleGun* GetParticleGun() const { return fParticleGun; }
-  
-  private:
-    G4ParticleGun*  fParticleGun;
+private:
+    G4Accumulable<G4int>    fGoodEvents;
+    G4Accumulable<G4double> fSumDose;  
+    G4int                 NumberChannel;
+    G4double              EnergyRange;
+    G4double              Histogram[11000];
+    G4double              Histogram2[11000];
+    G4double              Histogram3[11000];
+    G4double              Histogram4[11000];
+    G4double              Histogram5[11000];
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
+

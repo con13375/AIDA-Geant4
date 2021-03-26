@@ -24,30 +24,39 @@
 // ********************************************************************
 //
 //
-/// \file B3StackingAction.hh
-/// \brief Definition of the B3StackingAction class
+/// \file PrimaryGeneratorAction.hh
+/// \brief Definition of the PrimaryGeneratorAction class
 
-#ifndef B3StackingAction_h
-#define B3StackingAction_h 1
+#ifndef PrimaryGeneratorAction_h
+#define PrimaryGeneratorAction_h 1
 
-#include "G4UserStackingAction.hh"
+#include "G4VUserPrimaryGeneratorAction.hh"
+#include "G4ParticleGun.hh"
 #include "globals.hh"
 
-/// Stacking action class : manage the newly generated particles
-///
-/// One wishes do not track secondary neutrino.Therefore one kills it 
-/// immediately, before created particles will  put in a stack.
+class G4ParticleGun;
+class G4Event;
 
-class B3StackingAction : public G4UserStackingAction
+/// The primary generator action class with particle gum.
+///
+/// It defines an ion (F18), at rest, randomly distribued within a zone 
+/// in a patient defined in GeneratePrimaries(). Ion F18 can be changed 
+/// with the G4ParticleGun commands (see run2.mac).
+
+class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
   public:
-    B3StackingAction();
-    virtual ~B3StackingAction();
-     
-    virtual G4ClassificationOfNewTrack ClassifyNewTrack(const G4Track*);        
+    PrimaryGeneratorAction();    
+    virtual ~PrimaryGeneratorAction();
+
+    virtual void GeneratePrimaries(G4Event*);         
+
+    const G4ParticleGun* GetParticleGun() const { return fParticleGun; }
+  
+  private:
+    G4ParticleGun*  fParticleGun;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
-

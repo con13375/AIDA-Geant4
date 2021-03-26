@@ -1,0 +1,8 @@
+Available UI session types: [ Qt, GAG, tcsh, csh ]
+0.5
+plaque_nb,energy(MeV),x(mm),y(mm),z(mm),px,py,pz
+1,0.333684,-0.124916,-0.0428158,27.2905,0.607857,0.759731,0.230909
+A mass of 0.510999MeV at detector1 =G4_Si left Edep =0.0733043MeV at (mm): ((-0.0181033,0.0449365,27.284))
+A mass of 0.510999MeV at detector1 =G4_Si left Edep =0.124248MeV at (mm): ((-0.0240137,0.205975,27.1533))
+A mass of 0.510999MeV at detector1 =G4_Si left Edep =0.136132MeV at (mm): ((-0.0449966,0.228858,27.1224))
+A mass of 0.510999MeV at detector1 =G4_Si left Edep =0MeV at (mm): ((-0.0449966,0.228858,27.1224))

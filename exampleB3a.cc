@@ -39,9 +39,12 @@
 
 #include "Randomize.hh"
 
-#include "B3DetectorConstruction.hh"
-#include "B3PhysicsList.hh"
-#include "B3aActionInitialization.hh"
+#include "DetectorConstruction.hh"
+#include "PhysicsList.hh"
+#include "ActionInitialization.hh"
+#include "RunAction.hh"
+#include "EventAction.hh"
+#include "SteppingAction.hh"
 
 #include "G4VisExecutive.hh"
 #include "G4UIExecutive.hh"
@@ -71,13 +74,22 @@ int main(int argc,char** argv)
 
   // Set mandatory initialization classes
   //
-  runManager->SetUserInitialization(new B3DetectorConstruction);
+  runManager->SetUserInitialization(new DetectorConstruction);
   //
-  runManager->SetUserInitialization(new B3PhysicsList);
+  runManager->SetUserInitialization(new PhysicsList);
 
   // Set user action initialization
   //
-  runManager->SetUserInitialization(new B3aActionInitialization());
+  runManager->SetUserInitialization(new ActionInitialization());
+
+// set aditional user action classes
+  RunAction* run = new RunAction;
+  runManager->SetUserAction(run);
+  EventAction* event = new EventAction(run);
+  runManager->SetUserAction(event);
+  SteppingAction* step = 
+    new SteppingAction(event);
+  runManager->SetUserAction(step);
 
   // Initialize visualization
   //

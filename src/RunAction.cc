@@ -24,11 +24,11 @@
 // ********************************************************************
 //
 //
-/// \file B3aRunAction.cc
-/// \brief Implementation of the B3aRunAction class
+/// \file RunAction.cc
+/// \brief Implementation of the RunAction class
 
-#include "B3aRunAction.hh"
-#include "B3PrimaryGeneratorAction.hh"
+#include "RunAction.hh"
+#include "PrimaryGeneratorAction.hh"
 
 #include "G4RunManager.hh"
 #include "G4Run.hh"
@@ -38,7 +38,7 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-B3aRunAction::B3aRunAction()
+RunAction::RunAction()
  : G4UserRunAction(),
    fGoodEvents(0),
    fSumDose(0.)  
@@ -63,12 +63,12 @@ B3aRunAction::B3aRunAction()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-B3aRunAction::~B3aRunAction()
+RunAction::~RunAction()
 { }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void B3aRunAction::BeginOfRunAction(const G4Run* run)
+void RunAction::BeginOfRunAction(const G4Run* run)
 { 
   G4cout << "### Run " << run->GetRunID() << " start." << G4endl;
   
@@ -82,7 +82,7 @@ void B3aRunAction::BeginOfRunAction(const G4Run* run)
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void B3aRunAction::EndOfRunAction(const G4Run* run)
+void RunAction::EndOfRunAction(const G4Run* run)
 {
   G4int nofEvents = run->GetNumberOfEvent();
   if (nofEvents == 0) return;
@@ -94,8 +94,8 @@ void B3aRunAction::EndOfRunAction(const G4Run* run)
   // Run conditions
   //  note: There is no primary generator action object for "master"
   //        run manager for multi-threaded mode.
-  const B3PrimaryGeneratorAction* generatorAction
-    = static_cast<const B3PrimaryGeneratorAction*>(
+  const PrimaryGeneratorAction* generatorAction
+    = static_cast<const PrimaryGeneratorAction*>(
         G4RunManager::GetRunManager()->GetUserPrimaryGeneratorAction());
   G4String partName;
   if (generatorAction) 

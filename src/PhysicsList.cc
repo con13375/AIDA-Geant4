@@ -24,43 +24,40 @@
 // ********************************************************************
 //
 //
-/// \file B3aActionInitialization.cc
-/// \brief Implementation of the B3aActionInitialization class
+/// \file PhysicsList.cc
+/// \brief Implementation of the PhysicsList class
 
-#include "B3aActionInitialization.hh"
-#include "B3aRunAction.hh"
-#include "B3aEventAction.hh"
-#include "B3PrimaryGeneratorAction.hh"
-#include "B3StackingAction.hh"
+#include "PhysicsList.hh"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-B3aActionInitialization::B3aActionInitialization()
- : G4VUserActionInitialization()
-{}
+#include "G4DecayPhysics.hh"
+#include "G4EmStandardPhysics.hh"
+#include "G4RadioactiveDecayPhysics.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-B3aActionInitialization::~B3aActionInitialization()
-{}
+PhysicsList::PhysicsList() 
+: G4VModularPhysicsList(){
+  SetVerboseLevel(1);
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+  // Default physics
+  RegisterPhysics(new G4DecayPhysics());
 
-void B3aActionInitialization::BuildForMaster() const
-{
-  SetUserAction(new B3aRunAction);
+  // EM physics
+  RegisterPhysics(new G4EmStandardPhysics());
+
+  // Radioactive decay
+  RegisterPhysics(new G4RadioactiveDecayPhysics());
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void B3aActionInitialization::Build() const
-{
-  B3aRunAction* runAction = new B3aRunAction();
-  SetUserAction(runAction);
-
-  SetUserAction(new B3aEventAction(runAction));
-  SetUserAction(new B3PrimaryGeneratorAction);
-  SetUserAction(new B3StackingAction);
-}  
+PhysicsList::~PhysicsList()
+{ 
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void PhysicsList::SetCuts()
+{
+  G4VUserPhysicsList::SetCuts();
+}  

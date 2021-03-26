@@ -23,36 +23,49 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// 
-/// \file B3StackingAction.cc
-/// \brief Implementation of the B3StackingAction class
+//
+/// \file ActionInitialization.cc
+/// \brief Implementation of the ActionInitialization class
 
-#include "B3StackingAction.hh"
-
-#include "G4Track.hh"
-#include "G4NeutrinoE.hh"
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-B3StackingAction::B3StackingAction()
-{ }
+#include "ActionInitialization.hh"
+#include "RunAction.hh"
+#include "EventAction.hh"
+#include "SteppingAction.hh"
+#include "PrimaryGeneratorAction.hh"
+#include "StackingAction.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-B3StackingAction::~B3StackingAction()
-{ }
+ActionInitialization::ActionInitialization()
+ : G4VUserActionInitialization()
+{}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-G4ClassificationOfNewTrack
-B3StackingAction::ClassifyNewTrack(const G4Track* track)
+ActionInitialization::~ActionInitialization()
+{}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void ActionInitialization::BuildForMaster() const
 {
-  //keep primary particle
-  if (track->GetParentID() == 0) return fUrgent;
-
-  //kill secondary neutrino
-  if (track->GetDefinition() == G4NeutrinoE::NeutrinoE()) return fKill;
-  else return fUrgent;
+  SetUserAction(new RunAction);
 }
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void ActionInitialization::Build() const
+{
+  RunAction* runAction = new RunAction();
+  SetUserAction(runAction);
+
+  EventAction* eventAction = new EventAction(runAction);
+  SetUserAction(eventAction);
+
+  SetUserAction(new EventAction(runAction));
+  SetUserAction(new PrimaryGeneratorAction);
+  SetUserAction(new StackingAction);
+  SetUserAction(new SteppingAction(eventAction));
+}  
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -24,11 +24,11 @@
 // ********************************************************************
 //
 //
-/// \file B3aEventAction.cc
-/// \brief Implementation of the B3aEventAction class
+/// \file EventAction.cc
+/// \brief Implementation of the EventAction class
 
-#include "B3aEventAction.hh"
-#include "B3aRunAction.hh"
+#include "EventAction.hh"
+#include "RunAction.hh"
 
 #include "G4RunManager.hh"
 #include "G4Event.hh"
@@ -41,7 +41,7 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-B3aEventAction::B3aEventAction(B3aRunAction* runAction)
+EventAction::EventAction(RunAction* runAction)
  : G4UserEventAction(), 
    fRunAction(runAction),
    fCollID_cryst(-1),
@@ -50,17 +50,17 @@ B3aEventAction::B3aEventAction(B3aRunAction* runAction)
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-B3aEventAction::~B3aEventAction()
+EventAction::~EventAction()
 { }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void B3aEventAction::BeginOfEventAction(const G4Event* /*evt*/)
+void EventAction::BeginOfEventAction(const G4Event* /*evt*/)
 { }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void B3aEventAction::EndOfEventAction(const G4Event* evt )
+void EventAction::EndOfEventAction(const G4Event* evt )
 {
    //Hits collections
   //  
@@ -105,3 +105,24 @@ void B3aEventAction::EndOfEventAction(const G4Event* evt )
 }  
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void EventAction::addEdep(G4double Edep)
+{
+
+  TotalEnergyDeposit_1 += Edep;
+
+}
+
+void EventAction::addEdep2(G4double Edep)
+{
+
+  TotalEnergyDeposit_2 += Edep;
+
+}
+
+void EventAction::addEdep3(G4double Edep)
+{
+
+  TotalEnergyDeposit_3 += Edep;
+
+}

@@ -23,41 +23,36 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-//
-/// \file B3PhysicsList.cc
-/// \brief Implementation of the B3PhysicsList class
+// 
+/// \file StackingAction.cc
+/// \brief Implementation of the StackingAction class
 
-#include "B3PhysicsList.hh"
+#include "StackingAction.hh"
 
-#include "G4DecayPhysics.hh"
-#include "G4EmStandardPhysics.hh"
-#include "G4RadioactiveDecayPhysics.hh"
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-B3PhysicsList::B3PhysicsList() 
-: G4VModularPhysicsList(){
-  SetVerboseLevel(1);
-
-  // Default physics
-  RegisterPhysics(new G4DecayPhysics());
-
-  // EM physics
-  RegisterPhysics(new G4EmStandardPhysics());
-
-  // Radioactive decay
-  RegisterPhysics(new G4RadioactiveDecayPhysics());
-}
+#include "G4Track.hh"
+#include "G4NeutrinoE.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-B3PhysicsList::~B3PhysicsList()
-{ 
-}
+StackingAction::StackingAction()
+{ }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void B3PhysicsList::SetCuts()
+StackingAction::~StackingAction()
+{ }
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+G4ClassificationOfNewTrack
+StackingAction::ClassifyNewTrack(const G4Track* track)
 {
-  G4VUserPhysicsList::SetCuts();
-}  
+  //keep primary particle
+  if (track->GetParentID() == 0) return fUrgent;
+
+  //kill secondary neutrino
+  if (track->GetDefinition() == G4NeutrinoE::NeutrinoE()) return fKill;
+  else return fUrgent;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

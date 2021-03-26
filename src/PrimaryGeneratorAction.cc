@@ -24,10 +24,10 @@
 // ********************************************************************
 //
 //
-/// \file B3PrimaryGeneratorAction.cc
-/// \brief Implementation of the B3PrimaryGeneratorAction class
+/// \file PrimaryGeneratorAction.cc
+/// \brief Implementation of the PrimaryGeneratorAction class
 
-#include "B3PrimaryGeneratorAction.hh"
+#include "PrimaryGeneratorAction.hh"
 
 #include <math.h>       /* pow */
 #include <chrono>
@@ -49,7 +49,7 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-B3PrimaryGeneratorAction::B3PrimaryGeneratorAction()
+PrimaryGeneratorAction::PrimaryGeneratorAction()
  : G4VUserPrimaryGeneratorAction(),
    fParticleGun(0)
 {
@@ -69,7 +69,7 @@ B3PrimaryGeneratorAction::B3PrimaryGeneratorAction()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-B3PrimaryGeneratorAction::~B3PrimaryGeneratorAction()
+PrimaryGeneratorAction::~PrimaryGeneratorAction()
 {
   delete fParticleGun;
 }
@@ -89,7 +89,7 @@ G4double FermiDistribution( G4double a ){
   return FD;
 }
 
-void B3PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
+void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
   G4ParticleDefinition* particle = fParticleGun->GetParticleDefinition();
   if (particle == G4ChargedGeantino::ChargedGeantino()) {

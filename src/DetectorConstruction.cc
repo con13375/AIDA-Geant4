@@ -508,7 +508,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   logic_plastic -> SetVisAttributes(plastic_color);
 
   // Print header
-  std::cout << "plaque_nb" << "," << "energy(MeV)" << "," << "x(mm)" << "," << "y(mm)" << "," << "z(mm)" << "," << "px" << "," << "py" << "," << "pz" << std::endl;
+  std::cout << "#" << "," << "plaque_nb" << "," << "energy(MeV)" << "," << "x(mm)" << "," << "y(mm)" << "," << "z(mm)" << "," << "px" << "," << "py" << "," << "pz" << std::endl;
+  std::cout << "##" << "," << "massOfParticle" << "," << "energyDeposited(MeV)" << "," << "x(mm)" << "," << "y(mm)" << "," << "z(mm)" << std::endl;
 
   //always return the physical World
   //

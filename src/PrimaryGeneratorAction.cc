@@ -166,7 +166,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   //  }
   //}
 
-  std::cout << plaque_nb << "," << rdenergy << "," << x << "," << y << "," << z << "," << px << "," << py << "," << pz << std::endl;
+  std::cout << "#" << "," << plaque_nb << "," << rdenergy << "," << x << "," << y << "," << z << "," << px << "," << py << "," << pz << std::endl;
 
   fParticleGun->SetParticlePosition(G4ThreeVector(x,y,z));
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(px,py,pz));

@@ -45,8 +45,8 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
     G4ThreeVector position = aStep->GetPostStepPoint()->GetPosition();
 
     G4double EdepStep1 = aStep->GetTotalEnergyDeposit();
-     std::cout << "A mass of " << particleMass << "MeV at detector1 =" << currentMaterialName << " left Edep =" 
- 	       << EdepStep1 << "MeV at (mm): (" << position << ")" << std::endl;
+     std::cout << "##" << "," << particleMass << "," 
+ 	       << EdepStep1 << "," << position[0] << "," << position[1] << "," << position[2] << std::endl;
  
     if (EdepStep1 > 0.) eventAction->addEdep(EdepStep1);
    };  

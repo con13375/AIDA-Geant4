@@ -48,16 +48,13 @@ class EventAction : public G4UserEventAction
     virtual ~EventAction(); 
 
     virtual void  BeginOfEventAction(const G4Event*); //virtual
-    virtual void    EndOfEventAction(const G4Event*); //virtual
-    void addEdep(G4double Edep);          
-    void addEdep2(G4double Edep);    
-    void addEdep3(G4double Edep);
+    virtual void  EndOfEventAction(const G4Event*); //virtual
+    void addEdep(G4double Edep, G4int N_z, G4int N_y, G4int N_x);
     
   private:
     RunAction*  fRunAction;
-    G4double                  TotalEnergyDeposit_1;
-    G4double                  TotalEnergyDeposit_2;
-    G4double                  TotalEnergyDeposit_3;
+    G4double                  TotalEnergyDepositX[128*6];
+    G4double                  TotalEnergyDepositY[128*6];
     G4double                  Beta_total;
     G4double                  Beta_total_w;
     G4int fCollID_cryst;

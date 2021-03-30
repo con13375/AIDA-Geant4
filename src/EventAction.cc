@@ -55,74 +55,39 @@ EventAction::~EventAction()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void EventAction::BeginOfEventAction(const G4Event* /*evt*/)
-{ }
+void EventAction::addEdep(G4double Edep, G4int N_z, G4int N_y, G4int N_x)
+{
+
+  TotalEnergyDepositX[128*N_z + N_x] += Edep;
+  TotalEnergyDepositY[128*N_z + N_y] += Edep;
+
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void EventAction::EndOfEventAction(const G4Event* evt )
+void EventAction::BeginOfEventAction(const G4Event* /*evt*/)
 {
-   //Hits collections
-  //  
-  G4HCofThisEvent* HCE = evt->GetHCofThisEvent();
-  if(!HCE) return;
-               
-   // Get hits collections IDs
-  if (fCollID_cryst < 0) {
-    G4SDManager* SDMan = G4SDManager::GetSDMpointer();  
-    fCollID_cryst   = SDMan->GetCollectionID("crystal/edep");
-    fCollID_patient = SDMan->GetCollectionID("patient/dose");    
+  for(G4int i=0; i<128*6; i++){TotalEnergyDepositX[i] = 0;}
+  for(G4int i=0; i<128*6; i++){TotalEnergyDepositY[i] = 0;}
+  std::cout << "~" << "," << "massOfParticle" << "," << "energyDeposited(MeV)" << "," << "x(mm)" << "," << "y(mm)" << "," << "z(mm)" << std::endl;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void EventAction::EndOfEventAction(const G4Event* /*evt*/ )
+{
+  std::cout << "~" << "," << "energyDep_x" << "," << "N_x" << "," << "n_plaque" << std::endl;
+  for(G4int i=0; i<128*6; i++){
+    if(TotalEnergyDepositX[i] > 0){
+      std::cout << "###" << "," << TotalEnergyDepositX[i] << "," << i%128+1 << "," << i/128+1 << std::endl;
+    }
   }
-  
-  //Energy in crystals : identify 'good events'
-  //
-  const G4double eThreshold = 500*keV;
-  G4int nbOfFired = 0;
-   
-  G4THitsMap<G4double>* evtMap = 
-                     (G4THitsMap<G4double>*)(HCE->GetHC(fCollID_cryst));
-               
-  std::map<G4int,G4double*>::iterator itr;
-  for (itr = evtMap->GetMap()->begin(); itr != evtMap->GetMap()->end(); itr++) {
-    ///G4int copyNb  = (itr->first);
-    G4double edep = *(itr->second);
-    if (edep > eThreshold) nbOfFired++;
-    ///G4cout << "\n  cryst" << copyNb << ": " << edep/keV << " keV ";
-  }  
-  if (nbOfFired == 2) fRunAction->CountEvent();
-  
-  //Dose deposit in patient
-  //
-  G4double dose = 0.;
-     
-  evtMap = (G4THitsMap<G4double>*)(HCE->GetHC(fCollID_patient));
-               
-  for (itr = evtMap->GetMap()->begin(); itr != evtMap->GetMap()->end(); itr++) {
-    ///G4int copyNb  = (itr->first);
-    dose = *(itr->second);
+  std::cout << "~" << "," << "energyDep_Y" << "," << "N_y" << "," << "n_plaque" << std::endl;
+  for(G4int i=0; i<128*6; i++){
+    if(TotalEnergyDepositY[i] > 0){
+      std::cout << "####" << "," << TotalEnergyDepositY[i] << "," << i%128+1 << "," << i/128+1 << std::endl;
+    }
   }
-  if (dose > 0.) fRunAction->SumDose(dose);
 }  
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void EventAction::addEdep(G4double Edep)
-{
-
-  TotalEnergyDeposit_1 += Edep;
-
-}
-
-void EventAction::addEdep2(G4double Edep)
-{
-
-  TotalEnergyDeposit_2 += Edep;
-
-}
-
-void EventAction::addEdep3(G4double Edep)
-{
-
-  TotalEnergyDeposit_3 += Edep;
-
-}

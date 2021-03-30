@@ -27,6 +27,16 @@ SteppingAction::SteppingAction(EventAction* EvAct)
 SteppingAction::~SteppingAction()
 { }
 
+int discretize(G4double x, G4double a, G4double b, G4int N){
+  G4double m = N/(b-a);
+  if(x==b){
+    return N;
+  }
+  else{
+    return std::floor(m*(x-a));
+  }
+}
+
 void SteppingAction::UserSteppingAction(const G4Step* aStep)
 {
   // collect the energy deposited in the sensitive volume
@@ -44,11 +54,21 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
   if (currentPhysicalName == "DDSD" and 0.510 <= particleMass){// <= 0.511
     G4ThreeVector position = aStep->GetPostStepPoint()->GetPosition();
 
+    // This part transforms position to strip number (x,y), number of plaque (z)
+    G4double detector_XY = 38.15;
+    G4double first_pos = 38.7, plaque_sep = 11.6;
+    G4double max_Z = first_pos+0.5*plaque_sep;
+    G4double min_Z = first_pos-5.5*plaque_sep;
+    G4int N_x = discretize(position[0], -detector_XY, detector_XY, 128);
+    G4int N_y = discretize(position[1], -detector_XY, detector_XY, 128);
+    G4int N_z = discretize(-position[2], -max_Z, -min_Z, 6);
+
     G4double EdepStep1 = aStep->GetTotalEnergyDeposit();
      std::cout << "##" << "," << particleMass << "," 
- 	       << EdepStep1 << "," << position[0] << "," << position[1] << "," << position[2] << std::endl;
+ 	       << EdepStep1 << "," << position[0] << "," << position[1] << "," << position[2] <<
+               "," << N_x+1 << "," << N_y+1 << "," << N_z+1 << std::endl;
  
-    if (EdepStep1 > 0.) eventAction->addEdep(EdepStep1);
+    eventAction->addEdep(EdepStep1, N_z, N_y, N_x);
    };  
 
 /* G4double EdepStep = aStep->GetTotalEnergyDeposit();

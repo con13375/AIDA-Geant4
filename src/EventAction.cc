@@ -69,6 +69,7 @@ void EventAction::BeginOfEventAction(const G4Event* /*evt*/)
 {
   for(G4int i=0; i<128*6; i++){TotalEnergyDepositX[i] = 0;}
   for(G4int i=0; i<128*6; i++){TotalEnergyDepositY[i] = 0;}
+  std::cout << "~~~~~~~~~~~~~~ new event ~~~~~~~~~~~~~~" << std::endl;
   std::cout << "~" << "," << "massOfParticle" << "," << "energyDeposited(MeV)" << "," << "x(mm)" << "," << "y(mm)" << "," << "z(mm)" << std::endl;
 }
 

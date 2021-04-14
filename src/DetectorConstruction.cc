@@ -479,7 +479,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
   // ~~~~~~~~~~~~~~~~ Print headers
   std::cout << "#" << "," << "plaque_nb" << "," << "energy(MeV)" << "," << "x(mm)" << "," << "y(mm)" << "," << "z(mm)" << "," << "px" << "," << "py" << "," << "pz" << std::endl;
-  std::cout << "##" << "," << "massOfParticle" << "," << "energyDeposited(MeV)" << "," << "x(mm)" << "," << "y(mm)" << "," << "z(mm)" << std::endl;
+  std::cout << "##" << "," << "massOfParticle" << "," << "chargeOfParticle" << "," << "energyDeposited(MeV)" << "," << "x(mm)" << "," << "y(mm)" << "," << "z(mm)" << "," << "n_x" << "," << "n_y" << "," << "n_z" << std::endl;
   std::cout << "###" << "," << "energyDep_x" << "," << "N_x" << "," << "n_plaque" << std::endl;
   std::cout << "####" << "," << "energyDep_Y" << "," << "N_y" << "," << "n_plaque" << std::endl;
 

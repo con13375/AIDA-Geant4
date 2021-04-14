@@ -29,11 +29,13 @@
 
 #include "PrimaryGeneratorAction.hh"
 
-#include <math.h>       /* pow */
+#include <math.h>       /* pow */ /* tgamma */
 #include <chrono>
 #include <random>       
 // std::uniform_int_distribution<int> distrib(a, b)
 #include <vector>
+#include <complex>
+#include "complex4.h"
 //std::vector< int > arr;
 //arr.push_back(1);
 
@@ -76,16 +78,37 @@ PrimaryGeneratorAction::~PrimaryGeneratorAction()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-G4double FermiDistribution( G4double a ){
-  // particle energy by fermi distribution (pending)
-  G4double ep_energy = 3720000; // beta+ decay of 100Sn in eV
+G4double FermiDistribution(G4int Z, G4double x, G4double EP){
+  // particle energy by fermi distribution
+  // x runs from 0 to 1 (where 1 represents energy end point)
+  G4double x_E = x*EP/0.511+1; // E/mc2, where EP is the endpoint energy
+  G4double x_p = pow(pow(x_E,2)-1,0.5); // pc/W
 
-  G4double kT = 0.0254; // kT at room temperature in eV
-  //kT = 170000; // what if this is the actual temperature
-  G4double kT_norm = kT/ep_energy;
+  G4double S;
+  G4double A=1./137.0359895;
+  G4double y;
+
+//  std::complex<G4double> k;
+  S = sqrt(1.- pow((A*Z),2.));
+  y = A*Z*x_E/x_p;
+  std::complex<G4double> k(S,y);
+
   G4double FD;
-  FD = 1./(std::exp((a-1)/kT_norm)+1);
-  //FD = 1./( pow((a-1, 2.7182) + 1. );
+  if(x>0){
+    FD = pow(x_p,(2.*(S-1)))*exp(M_PI*y)*pow((abs(cgamma(k))),2.);
+  }
+  else{
+    FD = 0.;
+  }
+
+  // non relativistic:
+//  G4double ep_energy = 4740000; // beta+ decay of 100Sn in eV
+//  G4double kT = 0.0254; // kT at room temperature in eV
+  //kT = 170000; // what if this is the actual temperature
+//  G4double kT_norm = kT/ep_energy;
+//  FD = 1./(std::exp((a-1)/kT_norm)+1);
+
+  //std::cout << x << " , " << FD << std::endl;
   return FD;
 }
 
@@ -136,22 +159,44 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
 
   // energy distribution part
-  G4double end_point_energy = 3.72*MeV; // beta+ decay of 100Sn
+  G4double EP = 4.74;
+  G4double end_point_energy = EP*MeV; // beta+ decay of 100Sn, but also 3.72 meV??
 
+  G4int Z = -99; // daughter nucleus charge, negative because it's beta+
   G4double a_x;
-  G4int n_x = 1000, n_y = 1000;
-  std::vector< G4double > arr;
+  const G4int n_x = 1000; // number of bins in the spectrum
+  G4int n_y = 100*n_x; // this, divided by n_x, is the number of boxes per bin in average for the spectrum
+  std::vector< G4double > arr; // this vector will be up to size n_y, will contain all the "energy spectrum boxes" from which a random box will be chosen
+
+  G4double i_f; // not sure if this is necessary but this is a float version
+  G4double n_x_f; // float version
+  G4double a_E;
+  G4double a_p;
+  G4double top[n_x];
+  G4double accum;
+  G4double value;
+  accum = 0;
+  G4double height;
   for(G4int i=0; i<n_x; i++){
-    G4double i_f = i;
-    G4double n_x_f = n_x;
-    a_x = 1.3*i_f/n_x_f;
-    G4double a_E = (a_x+0.511/3.72);
-    G4double a_p = pow(pow(a_E,2)+pow(0.511/3.72,2),0.5);
-    G4double top = FermiDistribution(a_x)*a_p*a_E*pow(1-a_x,2);
+    i_f = i;
+    n_x_f = n_x;
+    a_x = 1*i_f/n_x_f; // was thinking of putting 1.25 to see what happens if i go overboard but no
+    a_E = (a_x+0.511/EP);
+    a_p = pow(pow(a_E,2)-pow(0.511/EP,2),0.5);
+    value = FermiDistribution(Z, a_x, EP)*a_p*a_E*pow(1-a_x,2);
+    top[i] = value;
+    accum += value;
     //std::cout << a_x << "," << a_E << "," << a_p << "," << pow(1-a_x,2) << "," << FermiDistribution(a_x) << "," << top << std::endl;
     //std::cout << top << std::endl;
-    for(G4int j=0; j<top*n_y; j++){
-      arr.push_back(a_x*end_point_energy);
+  }
+  for(G4int k=0; k<n_x; k++){
+    i_f = k;
+    n_x_f = n_x;
+    a_x = 1*i_f/n_x_f;
+    height = top[k]*n_y/accum; // dividing by accum normalizes
+    //std::cout << k << "," << height << std::endl;
+    for(G4int j=0; j<height; j++){ // because height is not an integer, we could not have known the size of arr from the start
+      arr.push_back(a_x*end_point_energy); // this makes a vector where the higher the value in array "top", the more frequent the corresponding energy a_x is
     }
   }
 

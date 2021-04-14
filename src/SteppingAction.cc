@@ -49,7 +49,8 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
   const G4String currentPhysicalName 
     = aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName();
   //std::cout << " detector1 =" << currentMaterialName << std::endl;
-  const G4double particleMass = aStep->GetPreStepPoint()->GetMass();
+  G4double particleMass = aStep->GetPreStepPoint()->GetMass();
+  G4double particleCharge = aStep->GetPreStepPoint()->GetCharge();
 
   if (currentPhysicalName == "DDSD" and 0.510 <= particleMass){// <= 0.511
     G4ThreeVector position = aStep->GetPostStepPoint()->GetPosition();
@@ -64,7 +65,7 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
     G4int N_z = discretize(-position[2], -max_Z, -min_Z, 6);
 
     G4double EdepStep1 = aStep->GetTotalEnergyDeposit();
-     std::cout << "##" << "," << particleMass << "," 
+     std::cout << "##" << "," << particleMass << "," << particleCharge << "," 
  	       << EdepStep1 << "," << position[0] << "," << position[1] << "," << position[2] <<
                "," << N_x+1 << "," << N_y+1 << "," << N_z+1 << std::endl;
  

@@ -70,7 +70,7 @@ RunAction::~RunAction()
 
 void RunAction::BeginOfRunAction(const G4Run* run)
 { 
-  std::cout << "~" << "," << "plaque_nb" << "," << "energy(MeV)" << "," << "x(mm)" << "," << "y(mm)" << "," << "z(mm)" << "," << "px" << "," << "py" << "," << "pz" << std::endl;
+
   G4cout << "### Run " << run->GetRunID() << " start." << G4endl;
   
   // reset accumulables to their initial values

@@ -52,8 +52,9 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
   G4double particleMass = aStep->GetPreStepPoint()->GetMass();
   G4double particleCharge = aStep->GetPreStepPoint()->GetCharge();
 
-  if (currentPhysicalName == "DDSD" and 0.510 <= particleMass){// <= 0.511
+  if (currentPhysicalName == "DDSD" and abs(particleCharge) > 0){// <= 0.511
     G4ThreeVector position = aStep->GetPostStepPoint()->GetPosition();
+    G4double time = aStep->GetPostStepPoint()->GetGlobalTime();
 
     // This part transforms position to strip number (x,y), number of plaque (z)
     G4double detector_XY = 38.15;
@@ -67,9 +68,9 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
     G4double EdepStep1 = aStep->GetTotalEnergyDeposit();
      std::cout << "##" << "," << particleMass << "," << particleCharge << "," 
  	       << EdepStep1 << "," << position[0] << "," << position[1] << "," << position[2] <<
-               "," << N_x+1 << "," << N_y+1 << "," << N_z+1 << std::endl;
+               "," << time << "," << N_x+1 << "," << N_y+1 << "," << N_z+1 << std::endl;
  
-    eventAction->addEdep(EdepStep1, N_z, N_y, N_x);
+    eventAction->addEdep(EdepStep1, N_z, N_y, N_x, time);
    };  
 
 /* G4double EdepStep = aStep->GetTotalEnergyDeposit();

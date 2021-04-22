@@ -55,12 +55,20 @@ EventAction::~EventAction()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void EventAction::addEdep(G4double Edep, G4int N_z, G4int N_y, G4int N_x)
+void EventAction::addEdep(G4double Edep, G4int N_z, G4int N_y, G4int N_x, G4double t)
 {
 
   TotalEnergyDepositX[128*N_z + N_x] += Edep;
   TotalEnergyDepositY[128*N_z + N_y] += Edep;
+  TEDPixel[128*128*N_z + 128*N_x + N_y] += Edep; // set up like this, n_y is the residual i%128, then n_x is the residual i/128%128, and then n_z is i/128/128
 
+  // these next lines save the min and max global time values for energy deposits in the two paradigms (X/Y or pixel)
+  minAndMaxTimeX[128*N_z + N_x] = std::min(minAndMaxTimeX[128*N_z + N_x],t);
+  minAndMaxTimeX[128*6 + 128*N_z + N_x] = std::max(minAndMaxTimeX[128*N_z + N_x],t);
+  minAndMaxTimeY[128*N_z + N_x] = std::min(minAndMaxTimeY[128*N_z + N_x],t);
+  minAndMaxTimeY[128*6 + 128*N_z + N_x] = std::max(minAndMaxTimeY[128*N_z + N_x],t);
+  minAndMaxTimePixel[128*128*N_z + 128*N_x + N_y] = std::min(minAndMaxTimePixel[128*128*N_z + 128*N_x + N_y],t);
+  minAndMaxTimePixel[128*128*6 + 128*128*N_z + 128*N_x + N_y] = std::max(minAndMaxTimePixel[128*128*6 + 128*128*N_z + 128*N_x + N_y],t);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -69,24 +77,33 @@ void EventAction::BeginOfEventAction(const G4Event* /*evt*/)
 {
   for(G4int i=0; i<128*6; i++){TotalEnergyDepositX[i] = 0;}
   for(G4int i=0; i<128*6; i++){TotalEnergyDepositY[i] = 0;}
-  std::cout << "~~~~~~~~~~~~~~ new event ~~~~~~~~~~~~~~" << std::endl;
-  std::cout << "~" << "," << "massOfParticle" << "," << "energyDeposited(MeV)" << "," << "x(mm)" << "," << "y(mm)" << "," << "z(mm)" << std::endl;
+  for(G4int i=0; i<128*128*6; i++){TEDPixel[i] = 0;}
+  for(G4int i=0; i<2*128*6; i++){if(i<128*6){minAndMaxTimeX[i] = 1000;} else{minAndMaxTimeX[i] = 0;}} // 1000 is chosen supposing it is bigger than the time values fed into the addEdep function
+  for(G4int i=0; i<2*128*6; i++){if(i<128*6){minAndMaxTimeY[i] = 1000;} else{minAndMaxTimeY[i] = 0;}}
+  for(G4int i=0; i<2*128*128*6; i++){if(i<128*128*6){minAndMaxTimePixel[i] = 1000;} else{minAndMaxTimePixel[i] = 0;}}
+  std::cout << "##" << "," << "massOfParticle" << "," << "chargeOfParticle" << "," << "energyDeposited(MeV)" << "," << "x(mm)" << "," << "y(mm)" << "," << "z(mm)" << "," << "t(ns)" << "," << "n_x" << "," << "n_y" << "," << "n_z" << std::endl;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void EventAction::EndOfEventAction(const G4Event* /*evt*/ )
 {
-  std::cout << "~" << "," << "energyDep_x" << "," << "N_x" << "," << "n_plaque" << std::endl;
+  std::cout << "~" << "," << "energyDep_x" << "," << "N_x" << "," << "n_plaque" << "," << "t_min" << "," << "t_max" << std::endl;
   for(G4int i=0; i<128*6; i++){
     if(TotalEnergyDepositX[i] > 0){
-      std::cout << "###" << "," << TotalEnergyDepositX[i] << "," << i%128+1 << "," << i/128+1 << std::endl;
+      std::cout << "###" << "," << TotalEnergyDepositX[i] << "," << i%128+1 << "," << i/128+1 << "," << minAndMaxTimeX[i] << "," << minAndMaxTimeX[128*6+i] << std::endl;
     }
   }
-  std::cout << "~" << "," << "energyDep_Y" << "," << "N_y" << "," << "n_plaque" << std::endl;
+  std::cout << "~" << "," << "energyDep_Y" << "," << "N_y" << "," << "n_plaque" << "," << "t_min" << "," << "t_max" << std::endl;
   for(G4int i=0; i<128*6; i++){
     if(TotalEnergyDepositY[i] > 0){
-      std::cout << "####" << "," << TotalEnergyDepositY[i] << "," << i%128+1 << "," << i/128+1 << std::endl;
+      std::cout << "####" << "," << TotalEnergyDepositY[i] << "," << i%128+1 << "," << i/128+1 << "," << minAndMaxTimeY[i] << "," << minAndMaxTimeY[128*6+i] << std::endl;
+    }
+  }
+  std::cout << "~" << "," << "energyDep_pixel" << "," << "N_x" << "," << "N_y" << "," << "n_plaque" << "," << "t_min" << "," << "t_max" << std::endl;
+  for(G4int i=0; i<128*128*6; i++){
+    if(TEDPixel[i] > 0){
+      std::cout << "####" << "," << TEDPixel[i] << "," << (i/128)%128+1 << "," << i%128+1 << "," << (i/128/128)+1 << "," << minAndMaxTimePixel[i] << "," << minAndMaxTimePixel[128*128*6+i] << std::endl;
     }
   }
 }  

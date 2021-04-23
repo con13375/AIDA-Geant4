@@ -55,6 +55,7 @@ class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
   
   private:
     G4ParticleGun*  fParticleGun;
+    G4double        GunCount;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

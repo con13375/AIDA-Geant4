@@ -49,14 +49,18 @@ class EventAction : public G4UserEventAction
 
     virtual void  BeginOfEventAction(const G4Event*); //virtual
     virtual void  EndOfEventAction(const G4Event*); //virtual
-    void addEdep(G4double Edep, G4int N_z, G4int N_y, G4int N_x);
+    void addEdep(G4double Edep, G4int N_z, G4int N_y, G4int N_x, G4double t);
     
   private:
     RunAction*  fRunAction;
     G4double                  TotalEnergyDepositX[128*6];
     G4double                  TotalEnergyDepositY[128*6];
-    G4double                  Beta_total;
+    G4double                  TEDPixel[128*128*6];
+    G4double                  minAndMaxTimeX[128*6*2];
+    G4double                  minAndMaxTimeY[128*6*2];
+    G4double                  minAndMaxTimePixel[128*128*6*2];
     G4double                  Beta_total_w;
+    G4double                  EventCount;
     G4int fCollID_cryst;
     G4int fCollID_patient;   
 };

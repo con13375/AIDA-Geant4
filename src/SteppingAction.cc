@@ -66,9 +66,9 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
     G4int N_z = discretize(-position[2], -max_Z, -min_Z, 6);
 
     G4double EdepStep1 = aStep->GetTotalEnergyDeposit();
-     std::cout << "##" << "," << particleMass << "," << particleCharge << "," 
- 	       << EdepStep1 << "," << position[0] << "," << position[1] << "," << position[2] <<
-               "," << time << "," << N_x+1 << "," << N_y+1 << "," << N_z+1 << std::endl;
+     //std::cout << "##" << "," << particleMass << "," << particleCharge << "," 
+ 	//       << EdepStep1 << "," << position[0] << "," << position[1] << "," << position[2] <<
+         //      "," << time << "," << N_x+1 << "," << N_y+1 << "," << N_z+1 << std::endl;
  
     eventAction->addEdep(EdepStep1, N_z, N_y, N_x, time);
    };  

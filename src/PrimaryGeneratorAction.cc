@@ -230,9 +230,10 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   //    break;
   //  }
   //}
-  std::cout << "~~~~~~~~~~~~~~ new event ~~~~~~~~~~~~~~" << std::endl;
-  std::cout << "~" << "," << "plaque_nb" << "," << "energy(MeV)" << "," << "x(mm)" << "," << "y(mm)" << "," << "z(mm)" << "," << "px" << "," << "py" << "," << "pz" << "," << "n_x" << "," << "n_y" << "," << "n_z" << std::endl;
-  std::cout << "#" << "," << plaque_nb+1 << "," << rdenergy << "," << x << "," << y << "," << z << "," << px << "," << py << "," << pz << "," << nx+1 << "," << ny+1 << "," << nz+1 << std::endl;
+  GunCount += 1;
+  std::cout << "Event# " << GunCount << std::endl;
+  //std::cout << "#" << "," <<  "Event" << "," << "plaque_nb" << "," << "energy(MeV)" << "," << "x(mm)" << "," << "y(mm)" << "," << "z(mm)" << "," << "px" << "," << "py" << "," << "pz" << "," << "n_x" << "," << "n_y" << "," << "n_z" << std::endl;
+  std::cout << "#" << "," << GunCount << "," << rdenergy << "," << nx+1 << "," << ny+1 << "," << nz+1 << std::endl;
 
   fParticleGun->SetParticlePosition(G4ThreeVector(x,y,z));
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(px,py,pz));

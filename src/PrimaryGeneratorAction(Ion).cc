@@ -111,10 +111,16 @@ G4double FermiDistribution(G4int Z, G4double x, G4double EP){
     FD = 0.;
   }
 
+  // non relativistic:
+//  G4double ep_energy = 4740000; // beta+ decay of 100Sn in eV
+//  G4double kT = 0.0254; // kT at room temperature in eV
+  //kT = 170000; // what if this is the actual temperature
+//  G4double kT_norm = kT/ep_energy;
+//  FD = 1./(std::exp((a-1)/kT_norm)+1);
+
+  //std::cout << x << " , " << FD << std::endl;
   return FD;
 }
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
@@ -130,7 +136,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     G4ParticleDefinition* ion
        = G4IonTable::GetIonTable()->GetIon(Z,A,excitEnergy);
     fParticleGun->SetParticleDefinition(ion);//ion);
-    fParticleGun->SetParticleCharge(ionCharge);
+    fParticleGun->SetParticleCharge(+Z*eplus);
   }
 
   // randomized direction  

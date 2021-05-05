@@ -124,7 +124,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   // ~~~~~~~~~~~~~~~~ kapton stuff
   G4double kapton_Y = 0.1*mm;
   G4double cu_X = 0.15*mm, cu_Y = 0.009*mm, cu_sep = 0.635*mm;
-  G4int n_cu = 68; // this should be 68, but i put it lower while building to ease loading time
+  G4int n_cu = 4; // this should be 68, but i put it lower while building to ease loading time
 
   // ~~~~~~~~~~~~~~~~ tubes, separators and bolts
   G4double tube_in = 0.825*mm, tube_out = 1.5*mm, tube_Z = 0.9*world_sizeZ;
@@ -479,10 +479,12 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
   // ~~~~~~~~~~~~~~~~ Print headers
   std::cout << "#" << "," <<  "Event" << "," << "energy(MeV)" << "," << "n_x" << "," << "n_y" << "," << "n_z" << std::endl;
-  std::cout << "##" << "," <<  "Event" << "," << "x(0)/y(1)" << "," << "energyDep_x" << "," << "n_x/n_y" << "," << "n_z" << std::endl;
-  std::cout << "###" <<  "," <<  "Event" << "," << "energyDep_pixel" << "," << "n_x" << "," << "n_y" << "," << "n_z" << std::endl;
+  std::cout << "##" << "," << "massOfParticle" << "," << "chargeOfParticle" << "," << "energyOfParticle(MeV)" << "," << "energyDeposited(MeV)" << "," //<< "x(mm)" << "," << "y(mm)" << "," << "z(mm)" << "," 
+  << "n_x" << "," << "n_y" << "," << "n_z" << "," << "timeOfDecay(ns)" << "," << "timeAfterDecay(ns)" << std::endl;
+  std::cout << "###" << "," <<  "Event" << "," << "x(0)/y(1)" << "," << "energyDep_x" << "," << "n_x/n_y" << "," << "n_z" << std::endl;
+  std::cout << "####" <<  "," <<  "Event" << "," << "energyDep_pixel" << "," << "n_x" << "," << "n_y" << "," << "n_z" << std::endl;
   //std::cout << "#" << "," << "plaque_nb" << "," << "energy(MeV)" << "," << "x(mm)" << "," << "y(mm)" << "," << "z(mm)" << "," << "px" << "," << "py" << "," << "pz" << "," << "n_x" << "," << "n_y" << "," << "n_z" << std::endl;
-  //std::cout << "##" << "," << "massOfParticle" << "," << "chargeOfParticle" << "," << "energyDeposited(MeV)" << "," << "x(mm)" << "," << "y(mm)" << "," << "z(mm)" << "," << "t(ns)" << "," << "n_x" << "," << "n_y" << "," << "n_z" << std::endl;
+
   //std::cout << "###" << "," << "energyDep_x" << "," << "N_x" << "," << "n_plaque" << std::endl;
   //std::cout << "####" << "," << "energyDep_Y" << "," << "N_y" << "," << "n_plaque" << std::endl;
 

@@ -50,7 +50,12 @@ class EventAction : public G4UserEventAction
     virtual void  BeginOfEventAction(const G4Event*); //virtual
     virtual void  EndOfEventAction(const G4Event*); //virtual
     void addEdep(G4double Edep, G4int N_z, G4int N_y, G4int N_x, G4double t);
-    
+
+    G4int                       timestamp;
+    G4int                       FIRST;
+    G4double                    previous_time;
+    G4double                    first_time;    
+
   private:
     RunAction*  fRunAction;
     G4double                  TotalEnergyDepositX[128*6];

@@ -20,6 +20,7 @@
 #include "G4SteppingManager.hh"
 #include "G4Step.hh"
 
+
 SteppingAction::SteppingAction(EventAction* EvAct) 
 :G4UserSteppingAction(),eventAction(EvAct)
 { }
@@ -51,10 +52,18 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
   //std::cout << " detector1 =" << currentMaterialName << std::endl;
   G4double particleMass = aStep->GetPreStepPoint()->GetMass();
   G4double particleCharge = aStep->GetPreStepPoint()->GetCharge();
+  G4double particleEnergy = aStep->GetPreStepPoint()->GetKineticEnergy();
+  //G4double particleDirection = aStep->GetPreStepPoint()->GetMomentumDirection();
 
-  if (currentPhysicalName == "DDSD" and abs(particleCharge) > 0){// <= 0.511
+  G4double time_res = 20; // nanoseconds corresponding to 50MHz
+  G4double energy_res = 0; // set at zero for now so no effect
+
+  if (currentPhysicalName == "DDSD"){// and abs(particleCharge) > 0){// <= 0.511
     G4ThreeVector position = aStep->GetPostStepPoint()->GetPosition();
     G4double time = aStep->GetPostStepPoint()->GetGlobalTime();
+    if (eventAction->FIRST == 0){eventAction->previous_time = time; eventAction->first_time = time; eventAction->FIRST += 1;} // only the first time, previous time is set to current time before timestamp check
+    if (time-eventAction->previous_time > time_res){eventAction->timestamp += 1;}
+    eventAction->previous_time = time;
 
     // This part transforms position to strip number (x,y), number of plaque (z)
     G4double detector_XY = 38.15;
@@ -66,11 +75,14 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
     G4int N_z = discretize(-position[2], -max_Z, -min_Z, 6);
 
     G4double EdepStep1 = aStep->GetTotalEnergyDeposit();
-     //std::cout << "##" << "," << particleMass << "," << particleCharge << "," 
- 	//       << EdepStep1 << "," << position[0] << "," << position[1] << "," << position[2] <<
-         //      "," << time << "," << N_x+1 << "," << N_y+1 << "," << N_z+1 << std::endl;
+    if (EdepStep1 > energy_res and time-eventAction->first_time < time_res){
+      std::cout <<  std::fixed << std::setprecision(9) 
+                << "##" << "," << particleMass << "," << particleCharge << "," << particleEnergy << "," 
+ 	        << EdepStep1 <<// "," << position[0] << "," << position[1] << "," << position[2] <<
+                "," << N_x+1 << "," << N_y+1 << "," << N_z+1 << "," << eventAction->first_time << "," << time-eventAction->first_time << std::endl;
  
-    eventAction->addEdep(EdepStep1, N_z, N_y, N_x, time);
+      eventAction->addEdep(EdepStep1, N_z, N_y, N_x, time);//if (timestamp == 0){}
+      }
    };  
 
 /* G4double EdepStep = aStep->GetTotalEnergyDeposit();

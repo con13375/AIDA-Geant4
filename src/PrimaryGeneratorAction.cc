@@ -120,7 +120,6 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
   G4ParticleDefinition* particle = fParticleGun->GetParticleDefinition();
   if (particle == G4ChargedGeantino::ChargedGeantino()) {
-    //fluorine 
     G4int Z = 50, A = 100;
     G4double ionCharge   = Z*eplus;
     G4double excitEnergy = 0.*keV;

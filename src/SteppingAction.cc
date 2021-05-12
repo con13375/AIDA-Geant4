@@ -55,7 +55,7 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
   G4double particleEnergy = aStep->GetPreStepPoint()->GetKineticEnergy();
   //G4double particleDirection = aStep->GetPreStepPoint()->GetMomentumDirection();
 
-  G4double time_res = 20; // nanoseconds corresponding to 50MHz
+  G4double time_res = 2000; // event window is 2 microseconds; or it could be 20 nanoseconds corresponding to 50MHz
   G4double energy_res = 0; // set at zero for now so no effect
 
   if (currentPhysicalName == "DDSD"){// and abs(particleCharge) > 0){// <= 0.511
@@ -75,13 +75,13 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
     G4int N_z = discretize(-position[2], -max_Z, -min_Z, 6);
 
     G4double EdepStep1 = aStep->GetTotalEnergyDeposit();
-    if (EdepStep1 > energy_res and time-eventAction->first_time < time_res){
+    if (EdepStep1 > energy_res and time-eventAction->first_time < time_res and 0 < N_x and N_x < 129 and 0 < N_y and N_y < 129){
       std::cout <<  std::fixed << std::setprecision(9) 
                 << "##" << "," << particleMass << "," << particleCharge << "," << particleEnergy << "," 
  	        << EdepStep1 <<// "," << position[0] << "," << position[1] << "," << position[2] <<
                 "," << N_x+1 << "," << N_y+1 << "," << N_z+1 << "," << eventAction->first_time << "," << time-eventAction->first_time << std::endl;
  
-      eventAction->addEdep(EdepStep1, N_z, N_y, N_x, time);//if (timestamp == 0){}
+      eventAction->addEdep(EdepStep1, N_z, N_y, N_x, time, particleCharge, particleEnergy);//if (timestamp == 0){}
       }
    };  
 

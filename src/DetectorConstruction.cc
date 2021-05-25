@@ -119,14 +119,14 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   G4double c_copper4_XY = c_copper1_XZ;
   G4double c_copper4_Z = 0.5*(connector_dz-bit_size/2+c_copper1_XZ);
   
-  G4int nb_plaques = 6;
+  G4int nb_plaques = 3;
   G4double separation = 10*mm;
   G4double AIDA_nose_Z = 5*cm;
 
   // ~~~~~~~~~~~~~~~~ kapton stuff
   G4double kapton_Y = 0.1*mm;
   G4double cu_X = 0.15*mm, cu_Y = 0.009*mm, cu_sep = 0.635*mm;
-  G4int n_cu = 4; // this should be 68, but i put it lower while building to ease loading time
+  G4int n_cu = 68; // this should be 68, but i put it lower while building to ease loading time
 
   // ~~~~~~~~~~~~~~~~ tubes, separators and bolts
   G4double tube_in = 0.825*mm, tube_out = 1.5*mm, tube_Z = 0.9*world_sizeZ;
@@ -213,7 +213,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //Phosphor Bronze
   density = 8.86*g/cm3; //unverified
   nel = 5;
-  G4Material* PBronze = new G4Material("FR4"  , density, nel); 
+  G4Material* PBronze = new G4Material("PBronze"  , density, nel); 
   PBronze->AddMaterial(nist->FindOrBuildMaterial("G4_Zn"), 9.9*perCent);
   PBronze->AddMaterial(nist->FindOrBuildMaterial("G4_Sn"), 2.2*perCent);
   PBronze->AddMaterial(nist->FindOrBuildMaterial("G4_Fe"), 1.9*perCent);
@@ -454,8 +454,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
                                   
   // ~~~~~~~~~~~~~~~~ Visualization attributes ~~~~~~~~~~~~~~~~
-  //
-
+  // Invisible world please
+  logicWorld->SetVisAttributes( G4VisAttributes::GetInvisible() );
   // ~~~~~~~~~~~~~~~~ Colors
   G4Colour gray_black(0.2, 0.2, 0.2);
   G4VisAttributes* connector_color = new G4VisAttributes(gray_black);

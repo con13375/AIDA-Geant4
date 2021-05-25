@@ -131,7 +131,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
                     = particleTable->FindParticle("geantino");
     G4ParticleDefinition* ion
        = G4IonTable::GetIonTable()->GetIon(Z,A,excitEnergy);
-    fParticleGun->SetParticleDefinition(geantino);//ion);
+    fParticleGun->SetParticleDefinition(geantino);//ion);//
     //fParticleGun->SetParticleCharge(ionCharge);
   }
 
@@ -189,9 +189,9 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   std::cout << "#" << "," << GunCount << "," << rdenergy << "," << nx+1 << "," << ny+1 << "," << nz+1 << std::endl;
 
   // Setting particle gun
-  fParticleGun->SetParticlePosition(G4ThreeVector(x,y,100*mm));//(x,y,z));
-  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0,0,-1));//(px,py,pz));
-  fParticleGun->SetParticleEnergy(1*GeV);//(rdenergy);
+  fParticleGun->SetParticlePosition(G4ThreeVector(x,y,100*mm));//(x,y,z));//
+  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0,0,-1));//(px,py,pz));//
+  fParticleGun->SetParticleEnergy(1*GeV);//(rdenergy);//
   //create vertex
   //
   fParticleGun->GeneratePrimaryVertex(anEvent);

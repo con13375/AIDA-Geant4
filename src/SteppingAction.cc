@@ -83,7 +83,13 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
  
       eventAction->addEdep(EdepStep1, N_z, N_y, N_x, time, particleCharge, particleEnergy);//if (timestamp == 0){}
       }
-   };  
+   }; 
+  
+  G4String ParticleName = aStep->GetTrack()->GetDynamicParticle()->GetDefinition()->GetParticleName();
+  if(ParticleName == "geantino"){
+    G4ThreeVector position = aStep->GetPostStepPoint()->GetPosition();
+    std::cout << "######" << position << "," << currentPhysicalName << "," << currentMaterialName << std::endl;
+  }
 
 /* G4double EdepStep = aStep->GetTotalEnergyDeposit();
  G4cout << " material =" << currentMaterialName << " Edep =" 

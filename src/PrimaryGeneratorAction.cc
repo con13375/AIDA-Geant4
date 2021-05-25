@@ -127,10 +127,12 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
     G4ParticleDefinition* positron
                     = particleTable->FindParticle("e+");
+    G4ParticleDefinition* geantino
+                    = particleTable->FindParticle("geantino");
     G4ParticleDefinition* ion
        = G4IonTable::GetIonTable()->GetIon(Z,A,excitEnergy);
-    fParticleGun->SetParticleDefinition(ion);//ion);
-    fParticleGun->SetParticleCharge(ionCharge);
+    fParticleGun->SetParticleDefinition(geantino);//ion);
+    //fParticleGun->SetParticleCharge(ionCharge);
   }
 
   // randomized direction  
@@ -163,8 +165,8 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   G4double number_x = std::min(40.0,std::max(-40.0,num1));
   G4double number_y = std::min(40.0,std::max(-40.0,num2));
 
-  G4double x = number_x*mm;//0*mm*(1-2*G4UniformRand());//r*std::cos(theta);//
-  G4double y = number_y*mm;//0*mm*(1-2*G4UniformRand());//r*std::sin(theta);//
+  G4double x = 60*mm*(1-2*G4UniformRand());//number_x*mm;//r*std::cos(theta);//
+  G4double y = 60*mm*(1-2*G4UniformRand());//number_y*mm;//r*std::sin(theta);//
   // uniform distribution in z within depth of detector from the chosen plaque
   G4double first_pos = 38.7*mm, plaque_sep = 11.6*mm, detector_Z = 0.5*mm;
   G4double z = first_pos-plaque_nb*plaque_sep + (0.5-G4UniformRand())*detector_Z;
@@ -187,9 +189,9 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   std::cout << "#" << "," << GunCount << "," << rdenergy << "," << nx+1 << "," << ny+1 << "," << nz+1 << std::endl;
 
   // Setting particle gun
-  fParticleGun->SetParticlePosition(G4ThreeVector(x,y,z));
-  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(px,py,pz));
-  fParticleGun->SetParticleEnergy(rdenergy);
+  fParticleGun->SetParticlePosition(G4ThreeVector(x,y,100*mm));//(x,y,z));
+  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0,0,-1));//(px,py,pz));
+  fParticleGun->SetParticleEnergy(1*GeV);//(rdenergy);
   //create vertex
   //
   fParticleGun->GeneratePrimaryVertex(anEvent);

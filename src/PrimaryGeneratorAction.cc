@@ -31,6 +31,7 @@
 
 #include <math.h>       /* pow */ /* tgamma */
 #include <chrono>
+#include <string>
 #include <random>       
 // std::uniform_int_distribution<int> distrib(a, b)
 #include <vector>
@@ -153,8 +154,17 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   G4double r_max = 40*mm; // from figure 4.3 in Oscar's thesis, we see the radius covers most of the detector
   G4double r_1 = G4UniformRand()*r_max; // this and the next line are a way to generate a random distribution with a peak in the center
   G4double r = r_1*(1-G4UniformRand());
-  G4double x = r*std::cos(theta);
-  G4double y = r*std::sin(theta);
+
+  // for a gaussian distribution of implantation place (quadrilateral symmetry)
+//  std::default_random_engine generator1;
+  std::normal_distribution<G4double> distribution(0.0,10.0);
+  G4double num1 = distribution(generator), num2 = distribution(generator);
+  //std::cout << num1 << "," << num2 << std::endl;
+  G4double number_x = std::min(40.0,std::max(-40.0,num1));
+  G4double number_y = std::min(40.0,std::max(-40.0,num2));
+
+  G4double x = number_x*mm;//0*mm*(1-2*G4UniformRand());//r*std::cos(theta);//
+  G4double y = number_y*mm;//0*mm*(1-2*G4UniformRand());//r*std::sin(theta);//
   // uniform distribution in z within depth of detector from the chosen plaque
   G4double first_pos = 38.7*mm, plaque_sep = 11.6*mm, detector_Z = 0.5*mm;
   G4double z = first_pos-plaque_nb*plaque_sep + (0.5-G4UniformRand())*detector_Z;

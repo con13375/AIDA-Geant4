@@ -47,6 +47,7 @@
 #include "G4IonTable.hh"
 #include "G4ParticleDefinition.hh"
 #include "G4ChargedGeantino.hh"
+#include "G4Positron.hh"
 #include "G4SystemOfUnits.hh"
 #include "Randomize.hh"
 
@@ -71,10 +72,9 @@ PrimaryGeneratorAction::PrimaryGeneratorAction()
 
   // default particle kinematic
 
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* particle
-                    = particleTable->FindParticle("chargedgeantino");
-  fParticleGun->SetParticleDefinition(particle);
+//  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+  G4ParticleDefinition* positron = G4Positron::PositronDefinition();
+  fParticleGun->SetParticleDefinition(positron);
   fParticleGun->SetParticlePosition(G4ThreeVector(0.,0.,0.));
   fParticleGun->SetParticleEnergy(1*eV);    
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1.,0.,0.));
@@ -116,24 +116,20 @@ G4double FermiDistribution(G4int Z, G4double x, G4double EP){
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
-  G4ParticleDefinition* particle = fParticleGun->GetParticleDefinition();
-  if (particle == G4ChargedGeantino::ChargedGeantino()) {
-    G4int Z = 50, A = 100;
-    G4double ionCharge   = Z*eplus;
-    G4double excitEnergy = 0.*keV;
-    G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-    G4ParticleDefinition* positron
-                    = particleTable->FindParticle("e+");
-    G4ParticleDefinition* geantino
-                    = particleTable->FindParticle("geantino");
-    G4ParticleDefinition* ion
-       = G4IonTable::GetIonTable()->GetIon(Z,A,excitEnergy);
-    fParticleGun->SetParticleDefinition(geantino);//ion);//
-    //fParticleGun->SetParticleCharge(ionCharge);
-  }
+  G4ParticleDefinition* positron = G4Positron::PositronDefinition();
+
+//  G4ParticleDefinition* particle = fParticleGun->GetParticleDefinition();
+//  G4int Z = 50, A = 100;
+//  G4double ionCharge   = Z*eplus;
+//  G4double excitEnergy = 0.*keV;
+//  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+//  G4ParticleDefinition* geantino = particleTable->FindParticle("geantino");
+  //G4ParticleDefinition* ion
+  //   = G4IonTable::GetIonTable()->GetIon(Z,A,excitEnergy);
+  fParticleGun->SetParticleDefinition(positron);//ion);//(geantino);//
+  //fParticleGun->SetParticleCharge(ionCharge);
 
   // randomized direction  
   G4double theta = 0, cos_phi = 0;
@@ -165,14 +161,14 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   G4double number_x = std::min(40.0,std::max(-40.0,num1));
   G4double number_y = std::min(40.0,std::max(-40.0,num2));
 
-  G4double x = 60*mm*(1-2*G4UniformRand());//number_x*mm;//r*std::cos(theta);//
-  G4double y = 60*mm*(1-2*G4UniformRand());//number_y*mm;//r*std::sin(theta);//
+  G4double x = number_x*mm;//60*mm*(1-2*G4UniformRand());//r*std::cos(theta);//
+  G4double y = number_y*mm;//60*mm*(1-2*G4UniformRand());//r*std::sin(theta);//
   // uniform distribution in z within depth of detector from the chosen plaque
   G4double first_pos = 38.7*mm, plaque_sep = 11.6*mm, detector_Z = 0.5*mm;
   G4double z = first_pos-plaque_nb*plaque_sep + (0.5-G4UniformRand())*detector_Z;
 
  	// This part transforms position to strip number (x,y), number of plaque (z)
-  G4double detector_XY = 38.15*mm;
+  G4double detector_XY = 71.63/2.0*mm;
   	//G4double first_pos = 38.7*mm, plaque_sep = 11.6*mm;
   G4double max_Z = first_pos+0.5*plaque_sep;
   G4double min_Z = first_pos-5.5*plaque_sep;
@@ -181,17 +177,73 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   G4int nz = discretize2(-z, -max_Z, -min_Z, 6);
 
   // energy distribution part
-  G4double rdenergy = 0; //setting the ion at rest now
+//  G4double rdenergy = 0; //setting the ion at rest now
 
+  G4double EP = 4.74;
+  G4double end_point_energy = EP*MeV; // beta+ decay of 100Sn, but also 3.72 meV??
+
+  G4int Z = 99; // daughter nucleus charge, positive because it's beta+
+  G4double a_x;
+
+// I created this 'for' loop as a brute force way to generate numbers from a probability distribution
+  const G4int n_x = 1000; // number of bins in the spectrum
+  G4int n_box = 100; // the number of boxes per bin in average for the spectrum
+  G4int n_y = n_box*n_x; // the total number of boxes for the spectrum
+  std::vector< G4double > arr; // this vector will be up to size n_y, will contain all the "energy spectrum boxes" from which a random box will be chosen
+
+  G4double i_f; // not sure if this is necessary but this is a float version
+  G4double n_x_f; // float version
+  G4double a_E;
+  G4double a_p;
+  G4double top[n_x];
+  G4double accum;
+  G4double value;
+  accum = 0;
+  G4double height;
+  for(G4int i=0; i<n_x; i++){
+    i_f = i;
+    n_x_f = n_x;
+    a_x = 1*i_f/n_x_f; // was thinking of putting 1.25 to see what happens if i go overboard but no
+    a_E = (a_x+0.511/EP);
+    a_p = pow(pow(a_E,2)-pow(0.511/EP,2),0.5);
+    value = FermiDistribution(Z, a_x, EP)*a_p*a_E*pow(1-a_x,2);
+    top[i] = value;
+    accum += value;
+    //std::cout << a_x << "," << a_E << "," << a_p << "," << pow(1-a_x,2) << "," << FermiDistribution(a_x) << "," << top << std::endl;
+    //std::cout << top << std::endl;
+  }
+  for(G4int k=0; k<n_x; k++){
+    i_f = k;
+    n_x_f = n_x;
+    a_x = 1*i_f/n_x_f;
+    height = top[k]*n_y/accum; // dividing by accum normalizes
+    //std::cout << k << "," << height << std::endl;
+    for(G4int j=0; abs(j-height) < n_box/100 or j<height; j++){ // because 'height' is not an integer, we could not have known the size of arr from the start, and the condition z allows a window around j == height
+      arr.push_back(a_x*end_point_energy); // this makes a vector where the higher the value in array "top", the more frequent an element within it that has the corresponding energy a_x
+    }
+  }
+
+  std::uniform_int_distribution<int> lucky(0, arr.size());  // which plaque is getting the beta
+
+  G4double rdenergy = arr.at(lucky(generator));
+
+  //if(GunCount == 0.0){x = 0*mm, y = 00*mm;}
+  //if(GunCount == 1.0){x = -42.0883*mm, y = -40.4312*mm;}
+  //if(GunCount == 2.0){x = -8.3195*mm, y = 39.9027*mm;}
+  //if(GunCount == 3.0){x = -34.5304*mm, y = -48.0646*mm;}
+  //if(GunCount == 4.0){x = -47.2406*mm, y = 34.5269*mm;}
+  //if(GunCount == 5.0){x = (47.5-1.3*1.5)*mm, y = (47.5-1.3*1.5)*mm;}
+  //x = 0, y = 0, z =  0*mm;
+  
   GunCount += 1;
   std::cout << "Event# " << GunCount << std::endl;
   //std::cout << "#" << "," <<  "Event" << "," << "plaque_nb" << "," << "energy(MeV)" << "," << "x(mm)" << "," << "y(mm)" << "," << "z(mm)" << "," << "px" << "," << "py" << "," << "pz" << "," << "n_x" << "," << "n_y" << "," << "n_z" << std::endl;
   std::cout << "#" << "," << GunCount << "," << rdenergy << "," << nx+1 << "," << ny+1 << "," << nz+1 << std::endl;
-
+  
   // Setting particle gun
-  fParticleGun->SetParticlePosition(G4ThreeVector(x,y,100*mm));//(x,y,z));//
-  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0,0,-1));//(px,py,pz));//
-  fParticleGun->SetParticleEnergy(1*GeV);//(rdenergy);//
+  fParticleGun->SetParticlePosition(G4ThreeVector(x,y,z));//(x,y,z));//
+  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(px,py,pz));//(1,0,0));//
+  fParticleGun->SetParticleEnergy(rdenergy);//(1*GeV);//
   //create vertex
   //
   fParticleGun->GeneratePrimaryVertex(anEvent);

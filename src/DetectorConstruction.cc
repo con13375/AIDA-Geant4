@@ -98,8 +98,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
   // ~~~~~~~~~~~~~~~~ plaque stuff
   //G4double plaqueVol_XY = 47.5*mm, plaqueVol_Z = 0.8*mm; // empty space mother of plaque, i regret doing this
-  G4double DDSD_XY = 4*cm, DDSD_Z = 0.5*mm; //including inactive area
-  G4double detector_XY = 3.815*cm; // just active area
+  G4double DDSD_XY = 7.560/2.0*cm, DDSD_Z = 0.5*mm; //including inactive area
+  G4double detector_XY = 7.163/2.0*cm; // just active area
   G4double Plastic_XY = 4.75*cm, Plastic_Z = 0.8*mm;
 
   // ~~~~~~~~~~~~~~~~ connector stuff
@@ -119,7 +119,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   G4double c_copper4_XY = c_copper1_XZ;
   G4double c_copper4_Z = 0.5*(connector_dz-bit_size/2+c_copper1_XZ);
   
-  G4int nb_plaques = 3;
+  G4int nb_plaques = 6;
   G4double separation = 10*mm;
   G4double AIDA_nose_Z = 5*cm;
 
@@ -184,10 +184,10 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   // for connector (LCP), i'm just setting the noryl percentages because I could not find them
   density = 1.75*g/cm3;
   nel = 3;
-  G4Material* LCP = new G4Material("LCP", density, nel);
-  LCP->AddMaterial(nist->FindOrBuildMaterial("G4_C"), 47.06*perCent);
-  LCP->AddMaterial(nist->FindOrBuildMaterial("G4_H"), 47.06*perCent);
-  LCP->AddMaterial(nist->FindOrBuildMaterial("G4_O"), 5.88*perCent);
+  G4Material* LCP = new G4Material("LCP" , density, nel);
+  LCP->AddElement(elC, 18); // 7+11
+  LCP->AddElement(elH, 14); // 6+8
+  LCP->AddElement(elO, 4); // 2+2
   
   //Epoxy (for FR4 ) #from https://agenda.infn.it/event/14179/contributions/23405/attachments/16712/18966/Geant_FR4_Raffaella_v1.pdf
   density = 1.2*g/cm3;
@@ -362,7 +362,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     G4double dZ = AIDA_nose_Z-(1+iplaque)*(separation+2*Plastic_Z);
     G4ThreeVector dZ_3V = G4ThreeVector(0,0,dZ);
     //std::cout << dZ << std::endl;
-    //std::cout << G4ThreeVector(0,0,Z)+dZ_3V+detector_spot << std::endl;
+    std::cout << G4ThreeVector(0,0,Z)+dZ_3V+detector_spot << std::endl;
 
     //placing Si detector
     new G4PVPlacement(0,G4ThreeVector(0,0,Z)+dZ_3V+detector_spot,logic_DDSD,"DDSD",

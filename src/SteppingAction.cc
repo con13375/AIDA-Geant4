@@ -53,6 +53,7 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
   G4double particleMass = aStep->GetPreStepPoint()->GetMass();
   G4double particleCharge = aStep->GetPreStepPoint()->GetCharge();
   G4double particleEnergy = aStep->GetPreStepPoint()->GetKineticEnergy();
+  G4String ParticleName = aStep->GetTrack()->GetDynamicParticle()->GetDefinition()->GetParticleName();
   //G4double particleDirection = aStep->GetPreStepPoint()->GetMomentumDirection();
 
   G4double time_res = 2000; // event window is 2 microseconds; or it could be 20 nanoseconds corresponding to 50MHz
@@ -66,7 +67,7 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
     eventAction->previous_time = time;
 
     // This part transforms position to strip number (x,y), number of plaque (z)
-    G4double detector_XY = 38.15;
+    G4double detector_XY = 71.63/2.0;
     G4double first_pos = 38.7, plaque_sep = 11.6;
     G4double max_Z = first_pos+0.5*plaque_sep;
     G4double min_Z = first_pos-5.5*plaque_sep;
@@ -74,18 +75,24 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
     G4int N_y = discretize(position[1], -detector_XY, detector_XY, 128);
     G4int N_z = discretize(-position[2], -max_Z, -min_Z, 6);
 
+    // Identifying particle and parent id
+    G4int TrackID = aStep->GetTrack()->GetTrackID();
+    G4int ParentID = aStep->GetTrack()->GetParentID();
+    const G4VProcess* CreatorProcess = aStep->GetTrack()->GetCreatorProcess();
+
+
     G4double EdepStep1 = aStep->GetTotalEnergyDeposit();
     if (EdepStep1 > energy_res and time-eventAction->first_time < time_res and 0 < N_x and N_x < 129 and 0 < N_y and N_y < 129){
       std::cout <<  std::fixed << std::setprecision(9) 
                 << "##" << "," << particleMass << "," << particleCharge << "," << particleEnergy << "," 
  	        << EdepStep1 <<// "," << position[0] << "," << position[1] << "," << position[2] <<
-                "," << N_x+1 << "," << N_y+1 << "," << N_z+1 << "," << eventAction->first_time << "," << time-eventAction->first_time << std::endl;
+                "," << N_x+1 << "," << N_y+1 << "," << N_z+1 << "," << eventAction->first_time << "," << time-eventAction->first_time
+		 << "," << ParticleName << "," << TrackID << "," << ParentID << "," << CreatorProcess << std::endl;
  
       eventAction->addEdep(EdepStep1, N_z, N_y, N_x, time, particleCharge, particleEnergy);//if (timestamp == 0){}
       }
    }; 
-  
-  G4String ParticleName = aStep->GetTrack()->GetDynamicParticle()->GetDefinition()->GetParticleName();
+
   if(ParticleName == "geantino"){
     G4ThreeVector position = aStep->GetPostStepPoint()->GetPosition();
     std::cout << "######" << position << "," << currentPhysicalName << "," << currentMaterialName << std::endl;

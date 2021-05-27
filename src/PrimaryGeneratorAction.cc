@@ -158,12 +158,12 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   std::normal_distribution<G4double> distribution(0.0,10.0);
   G4double num1 = distribution(generator), num2 = distribution(generator);
   //std::cout << num1 << "," << num2 << std::endl;
-  G4double Si_size = 75.60; // mm
+  G4double Si_size = 75.60/2; // mm
   G4double number_x = std::min(Si_size,std::max(-Si_size,num1));
   G4double number_y = std::min(Si_size,std::max(-Si_size,num2));
 
-  G4double x = number_x*mm;//60*mm*(1-2*G4UniformRand());//r*std::cos(theta);//
-  G4double y = number_y*mm;//60*mm*(1-2*G4UniformRand());//r*std::sin(theta);//
+  G4double x = number_x*mm;//Si_size*mm*(1-2*G4UniformRand());//r*std::cos(theta);//
+  G4double y = number_y*mm;//Si_size*mm*(1-2*G4UniformRand());//r*std::sin(theta);//
   // uniform distribution in z within depth of detector from the chosen plaque
   G4double first_pos = 38.7*mm, plaque_sep = 11.6*mm, detector_Z = 0.5*mm;
   G4double z = first_pos-plaque_nb*plaque_sep + (0.5-G4UniformRand())*detector_Z;
@@ -224,7 +224,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     }
   }
 
-  std::uniform_int_distribution<int> lucky(0, arr.size());  // which plaque is getting the beta
+  std::uniform_int_distribution<int> lucky(0, arr.size()-1);  // which plaque is getting the beta
 
   G4double rdenergy = arr.at(lucky(generator));
 

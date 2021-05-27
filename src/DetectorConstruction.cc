@@ -127,7 +127,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   // ~~~~~~~~~~~~~~~~ kapton stuff
   G4double kapton_Y = 0.1*mm;
   G4double cu_X = 0.15*mm, cu_Y = 0.009*mm, cu_sep = 0.635*mm;
-  G4int n_cu = 68; // this should be 68, but i put it lower while building to ease loading time
+  G4int n_cu = 4; // this should be 68, but i put it lower while building to ease loading time
 
   // ~~~~~~~~~~~~~~~~ tubes, separators and bolts
   G4double tube_in = 0.825*mm, tube_out = 1.5*mm, tube_Z = (AIDA_nose_Z + world_sizeZ)/2.0;
@@ -377,7 +377,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   // ~~~~~~~~~~~~~~~~ Assembling plaque
   G4double Z = 0;
   G4double Z2 = connector_dz+Plastic_Z;
-  std::cout << DDSD_Z << std::endl;
+  //std::cout << DDSD_Z << std::endl;
   for (G4int iplaque = 0; iplaque < nb_plaques ; iplaque++) {
     
     G4double dZ = AIDA_nose_Z-(1+iplaque)*(separation+2*Plastic_Z);

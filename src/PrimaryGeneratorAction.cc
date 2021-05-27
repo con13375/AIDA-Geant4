@@ -143,7 +143,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   std::default_random_engine generator (seed);
   std::uniform_int_distribution<int> distrib(0, 5);
-  G4double plaque_nb = distrib(generator);
+  G4double plaque_nb = 1;//distrib(generator);
   //std::cout << plaque_nb << std::endl;
 
   // randomize position x,y,z
@@ -158,8 +158,9 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   std::normal_distribution<G4double> distribution(0.0,10.0);
   G4double num1 = distribution(generator), num2 = distribution(generator);
   //std::cout << num1 << "," << num2 << std::endl;
-  G4double number_x = std::min(40.0,std::max(-40.0,num1));
-  G4double number_y = std::min(40.0,std::max(-40.0,num2));
+  G4double Si_size = 75.60; // mm
+  G4double number_x = std::min(Si_size,std::max(-Si_size,num1));
+  G4double number_y = std::min(Si_size,std::max(-Si_size,num2));
 
   G4double x = number_x*mm;//60*mm*(1-2*G4UniformRand());//r*std::cos(theta);//
   G4double y = number_y*mm;//60*mm*(1-2*G4UniformRand());//r*std::sin(theta);//

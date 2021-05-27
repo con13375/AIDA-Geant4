@@ -78,17 +78,26 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
     // Identifying particle and parent id
     G4int TrackID = aStep->GetTrack()->GetTrackID();
     G4int ParentID = aStep->GetTrack()->GetParentID();
+//    const G4String& CreatorProcessName;
     const G4VProcess* CreatorProcess = aStep->GetTrack()->GetCreatorProcess();
 
-
     G4double EdepStep1 = aStep->GetTotalEnergyDeposit();
-    if (EdepStep1 > energy_res and time-eventAction->first_time < time_res and 0 < N_x and N_x < 129 and 0 < N_y and N_y < 129){
+    if (EdepStep1 > energy_res and time-eventAction->first_time < time_res and -1 < N_x and N_x < 128 and -1 < N_y and N_y < 128){
+      if(CreatorProcess == 0){
       std::cout <<  std::fixed << std::setprecision(9) 
                 << "##" << "," << particleMass << "," << particleCharge << "," << particleEnergy << "," 
  	        << EdepStep1 <<// "," << position[0] << "," << position[1] << "," << position[2] <<
                 "," << N_x+1 << "," << N_y+1 << "," << N_z+1 << "," << eventAction->first_time << "," << time-eventAction->first_time
-		 << "," << ParticleName << "," << TrackID << "," << ParentID << "," << CreatorProcess << std::endl;
- 
+		 << "," << ParticleName << "," << TrackID << "," << ParentID << "," << "gun" << std::endl;
+      }
+      else{
+      std::cout <<  std::fixed << std::setprecision(9) 
+                << "##" << "," << particleMass << "," << particleCharge << "," << particleEnergy << "," 
+ 	        << EdepStep1 <<// "," << position[0] << "," << position[1] << "," << position[2] <<
+                "," << N_x+1 << "," << N_y+1 << "," << N_z+1 << "," << eventAction->first_time << "," << time-eventAction->first_time
+		 << "," << ParticleName << "," << TrackID << "," << ParentID << "," << CreatorProcess->GetProcessName() << std::endl;
+      }
+
       eventAction->addEdep(EdepStep1, N_z, N_y, N_x, time, particleCharge, particleEnergy);//if (timestamp == 0){}
       }
    }; 

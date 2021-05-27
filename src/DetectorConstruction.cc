@@ -38,6 +38,7 @@
 #include "G4NistManager.hh"
 #include "G4Box.hh"
 #include "G4Tubs.hh"
+#include "G4Sphere.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 #include "G4RotationMatrix.hh"
@@ -129,12 +130,18 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   G4int n_cu = 68; // this should be 68, but i put it lower while building to ease loading time
 
   // ~~~~~~~~~~~~~~~~ tubes, separators and bolts
-  G4double tube_in = 0.825*mm, tube_out = 1.5*mm, tube_Z = 0.9*world_sizeZ;
+  G4double tube_in = 0.825*mm, tube_out = 1.5*mm, tube_Z = (AIDA_nose_Z + world_sizeZ)/2.0;
   G4double separator_R1 = tube_out, separator_R2 = 2*mm, separator_R3 = 2.75*mm, separator_Z = 4.15*mm;
   G4double bolt_R1 = tube_out, bolt_R2 = 2*mm, bolt_R3 = 3.5*mm, bolt_Z1 = 2.65*mm, bolt_Z2 = 3.5*mm;
   G4double nut_R = 0.8*mm, nut_Z = 0.5*(bolt_R3-bolt_R1);
 
   G4int n_tubes = 4;
+
+  // ~~~~~~~~~~~~~~~~ Al and Mylar
+  G4double Al_case_dx = 5*mm;
+  G4double Al_case_xy = Plastic_XY+Al_case_dx+3*mm, Al_case_z = (AIDA_nose_Z + world_sizeZ)/2.0;
+
+  G4double Mylar_case_r1 = Al_case_xy*1.4143+1*mm, Mylar_case_dr = 0.03*mm, Mylar_case_z = Al_case_z;
 
   // ~~~~~~~~~~~~~~~~ Materials ~~~~~~~~~~~~~~~~
 
@@ -155,6 +162,9 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   a = 28.0855*g/mole;
   G4Element* elSi  = new G4Element("Silicon"  ,"Si" , 14., a);
 
+//  a = 26.9815386*g/mole;
+//  G4Element* elAl  = new G4Element("Aluminum"  ,"Al" , 13., a);
+//
 //  a = 65.38*g/mole;
 //  G4Element* elZn  = new G4Element("Zinc"  ,"Zn" , 12., a);
 //
@@ -230,6 +240,16 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   Kapton->AddElement(elN,2);
   Kapton->AddElement(elH,10);
 
+  //Aluminum case
+  G4Material* Al_case_mat = nist->FindOrBuildMaterial("G4_Al");
+
+  // Mylar
+  density = 1.39*g/cm3;
+  G4Material* Mylar = new G4Material("Mylar", density, 3);
+  Mylar->AddElement(elO,2);
+  Mylar->AddElement(elC,5);
+  Mylar->AddElement(elH,4);
+
   // ~~~~~~~~~~~~~~~~ Making and placing titanium cilinders, separators, and bolts ~~~~~~~~~~~~~~~~
 
 
@@ -264,7 +284,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     G4ThreeVector y = G4ThreeVector(std::cos(itubes*pi/2),std::sin(itubes*pi/2),0.); // these vectors set up the quadrilateral symmetry
     G4ThreeVector x = G4ThreeVector(-std::sin(itubes*pi/2),std::cos(itubes*pi/2),0.);
     G4ThreeVector z = G4ThreeVector(0,0,tube_pos_Z);
-    G4ThreeVector position = (tube_pos_XY)*y+(tube_pos_XY)*x+z; // this will be referenced: position of tube
+    G4ThreeVector position = (tube_pos_XY)*y+(tube_pos_XY)*x+z; // this will be referenced: position of tube with z on 0
+    G4ThreeVector position_tube = (tube_pos_XY)*y+(tube_pos_XY)*x+G4ThreeVector(0,0,(-world_sizeZ+tube_Z)); // this will be referenced: position of tube with z correct
     //std::cout << position << std::endl;
     //std::cout << itubes << std::endl;
 
@@ -293,7 +314,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
         new G4PVPlacement(0,position_sep, logic_separator, "separator", logicWorld, false,2*itubes+isep, fCheckOverlaps);
       }
     }
-    new G4PVPlacement(0,position, logic_tube, "tube", logicWorld, false, itubes, fCheckOverlaps);
+    new G4PVPlacement(0,position_tube, logic_tube, "tube", logicWorld, false, itubes, fCheckOverlaps);
   }
 
   // ~~~~~~~~~~~~~~~~ Making and placing plaques ~~~~~~~~~~~~~~~~
@@ -356,13 +377,13 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   // ~~~~~~~~~~~~~~~~ Assembling plaque
   G4double Z = 0;
   G4double Z2 = connector_dz+Plastic_Z;
-  //std::cout << DDSD_Z << std::endl;
+  std::cout << DDSD_Z << std::endl;
   for (G4int iplaque = 0; iplaque < nb_plaques ; iplaque++) {
     
     G4double dZ = AIDA_nose_Z-(1+iplaque)*(separation+2*Plastic_Z);
     G4ThreeVector dZ_3V = G4ThreeVector(0,0,dZ);
     //std::cout << dZ << std::endl;
-    std::cout << G4ThreeVector(0,0,Z)+dZ_3V+detector_spot << std::endl;
+    //std::cout << G4ThreeVector(0,0,Z)+dZ_3V+detector_spot << std::endl;
 
     //placing Si detector
     new G4PVPlacement(0,G4ThreeVector(0,0,Z)+dZ_3V+detector_spot,logic_DDSD,"DDSD",
@@ -452,10 +473,36 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     }
   }
 
-                                  
+  // ~~~~~~~~~~~~~~~~ Making and placing aluminum and Mylar cases ~~~~~~~~~~~~~~~~
+
+
+  // ~~~~~~~~~~~~~~~~ Making the cases
+  G4Box* Al_case_full = new G4Box("Al_case_full", Al_case_xy, Al_case_xy, Al_case_z);
+  G4Box* Al_case_hole = new G4Box("Al_case_hole", Al_case_xy-Al_case_dx, Al_case_xy-Al_case_dx, Al_case_z);
+  G4SubtractionSolid* Al_case_box = new G4SubtractionSolid("Al_case_box",Al_case_full,Al_case_hole,0,G4ThreeVector(0,0,0));
+
+  G4Sphere* Mylar_cap = new G4Sphere("Mylar_cap", Mylar_case_r1, Mylar_case_r1+Mylar_case_dr, 0, twopi, 0, pi/2);
+  G4Tubs* Mylar_tube = new G4Tubs("Mylartube", Mylar_case_r1, Mylar_case_r1+Mylar_case_dr, Mylar_case_z, 0, twopi);
+  G4ThreeVector MylarTrans(0,0,Mylar_case_z);
+  G4UnionSolid* Mylar_case = new G4UnionSolid("Mylar_case", Mylar_tube, Mylar_cap, 0, MylarTrans);
+
+  // ~~~~~~~~~~~~~~~~ Logics for cases
+
+  G4LogicalVolume* logic_al = new G4LogicalVolume(Al_case_box, Al_case_mat, "Aluminum");
+  G4LogicalVolume* logic_Mylar = new G4LogicalVolume(Mylar_case, SiO2, "Mylar");
+
+  // ~~~~~~~~~~~~~~~~ Placing cases
+  new G4PVPlacement(0,G4ThreeVector(0,0,-world_sizeZ+Al_case_z), logic_al, "Aluminum",
+	  logicWorld, false, 0, fCheckOverlaps);
+  new G4PVPlacement(0,G4ThreeVector(0,0,-world_sizeZ+Al_case_z+0*(Mylar_case_r1+Mylar_case_dr)), logic_Mylar, "Mylar",
+	  logicWorld, false, 0, fCheckOverlaps);
+
   // ~~~~~~~~~~~~~~~~ Visualization attributes ~~~~~~~~~~~~~~~~
-  // Invisible world please
+  // Invisible world and cases please
   logicWorld->SetVisAttributes( G4VisAttributes::GetInvisible() );
+  logic_al->SetVisAttributes( G4VisAttributes::GetInvisible() );
+  logic_Mylar->SetVisAttributes( G4VisAttributes::GetInvisible() );
+
   // ~~~~~~~~~~~~~~~~ Colors
   G4Colour gray_black(0.2, 0.2, 0.2);
   G4VisAttributes* connector_color = new G4VisAttributes(gray_black);
@@ -485,7 +532,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   // ~~~~~~~~~~~~~~~~ Print headers
   std::cout << "#" << "," <<  "Event" << "," << "energy(MeV)" << "," << "n_x" << "," << "n_y" << "," << "n_z" << std::endl;
   std::cout << "##" << "," << "massOfParticle" << "," << "chargeOfParticle" << "," << "energyOfParticle(MeV)" << "," << "energyDeposited(MeV)" << "," //<< "x(mm)" << "," << "y(mm)" << "," << "z(mm)" << "," 
-  << "n_x" << "," << "n_y" << "," << "n_z" << "," << "timeOfDecay(ns)" << "," << "timeAfterDecay(ns)" << std::endl;
+  << "n_x" << "," << "n_y" << "," << "n_z" << "," << "timeOfDecay(ns)" << "," << "timeAfterDecay(ns)" << "," <<  "ParticleName" << "," << "trackID" << "," << "ParentID" << "," << "CreatorProcess" << std::endl;
   std::cout << "###" << "," <<  "Event" << "," << "x(0)/y(1)" << "," << "energyDep_x" << "," << "n_x/n_y" << "," << "n_z" << "," << "zeroes" << std::endl;
   std::cout << "####" <<  "," <<  "Event" << "," << "energyDep_pixel" << "," << "beta_percent" << "," << "n_x" << "," << "n_y" << "," << "n_z" << std::endl;
   std::cout << "#####" <<  "," <<  "TotalEnergyDeposited" << "," << "EnergyFromBeta" << "," << "PercentageFromBeta" << std::endl;

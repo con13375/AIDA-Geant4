@@ -51,7 +51,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction
     virtual G4VPhysicalVolume* Construct();
                
   private:
-
+//#include "Parameters.hh"
     G4bool  fCheckOverlaps;
 };
 

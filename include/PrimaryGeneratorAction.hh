@@ -54,6 +54,7 @@ class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
     const G4ParticleGun* GetParticleGun() const { return fParticleGun; }
   
   private:
+//#include "Parameters.hh"
     G4ParticleGun*  fParticleGun;
     G4double        GunCount;
 };

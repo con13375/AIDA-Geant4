@@ -28,6 +28,7 @@
 /// \brief Implementation of the PrimaryGeneratorAction class
 
 #include "PrimaryGeneratorAction.hh"
+#include "Parameters.hh"
 
 #include <math.h>       /* pow */ /* tgamma */
 #include <chrono>
@@ -67,6 +68,7 @@ PrimaryGeneratorAction::PrimaryGeneratorAction()
  : G4VUserPrimaryGeneratorAction(),
    fParticleGun(0)
 {
+//#include "Parameters.icc"
   G4int n_particle = 1;
   fParticleGun  = new G4ParticleGun(n_particle);
 
@@ -118,6 +120,7 @@ G4double FermiDistribution(G4int Z, G4double x, G4double EP){
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
+//#include "Parameters.icc"
   G4ParticleDefinition* positron = G4Positron::PositronDefinition();
 
 //  G4ParticleDefinition* particle = fParticleGun->GetParticleDefinition();
@@ -143,33 +146,34 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   std::default_random_engine generator (seed);
   std::uniform_int_distribution<int> distrib(0, 5);
-  G4double plaque_nb = 1;//distrib(generator);
+  G4double plaque_nb = distrib(generator);//1;//
   //std::cout << plaque_nb << std::endl;
 
   // randomize position x,y,z
   	// circular xy position distribution with peak at center
   theta = 2*CLHEP::pi*G4UniformRand();
-  G4double r_max = 40*mm; // from figure 4.3 in Oscar's thesis, we see the radius covers most of the detector
+  G4double r_max = 1.1*DDSD_XY_num*mm; // from figure 4.3 in Oscar's thesis, we see the radius covers most of the detector
   G4double r_1 = G4UniformRand()*r_max; // this and the next line are a way to generate a random distribution with a peak in the center
   G4double r = r_1*(1-G4UniformRand());
 
   // for a gaussian distribution of implantation place (quadrilateral symmetry)
 //  std::default_random_engine generator1;
-  std::normal_distribution<G4double> distribution(0.0,10.0);
+  std::normal_distribution<G4double> distribution(0.0,10); // 10 chosen cause it shows up nicely. no further info of implantation distribution has been added
   G4double num1 = distribution(generator), num2 = distribution(generator);
-  //std::cout << num1 << "," << num2 << std::endl;
-  G4double Si_size = 75.60/2; // mm
+//  std::cout << num1 << "," << num2 <<"," << DDSD_XY_num<< std::endl;
+  G4double Si_size = DDSD_XY_num; // mm
   G4double number_x = std::min(Si_size,std::max(-Si_size,num1));
   G4double number_y = std::min(Si_size,std::max(-Si_size,num2));
 
   G4double x = number_x*mm;//Si_size*mm*(1-2*G4UniformRand());//r*std::cos(theta);//
   G4double y = number_y*mm;//Si_size*mm*(1-2*G4UniformRand());//r*std::sin(theta);//
   // uniform distribution in z within depth of detector from the chosen plaque
-  G4double first_pos = 38.7*mm, plaque_sep = 11.6*mm, detector_Z = 0.5*mm;
+  G4double first_pos = 0+AIDA_nose_Z-(1+0)*(separation+2*Plastic_Z)+Plastic_Z-DDSD_Z; // expression assembled from detectorConstruction first detector placement, taking Z = 0
+  G4double plaque_sep = separation+Plastic_Z, detector_Z = DDSD_Z;
   G4double z = first_pos-plaque_nb*plaque_sep + (0.5-G4UniformRand())*detector_Z;
 
  	// This part transforms position to strip number (x,y), number of plaque (z)
-  G4double detector_XY = 71.63/2.0*mm;
+  //G4double detector_XY = detector_XY_num*mm;
   	//G4double first_pos = 38.7*mm, plaque_sep = 11.6*mm;
   G4double max_Z = first_pos+0.5*plaque_sep;
   G4double min_Z = first_pos-5.5*plaque_sep;
@@ -180,7 +184,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   // energy distribution part
 //  G4double rdenergy = 0; //setting the ion at rest now
 
-  G4double EP = 4.74;
+  G4double EP = 0.5+0.5*std::floor(GunCount/15000);// NNDC says 4.74;
   G4double end_point_energy = EP*MeV; // beta+ decay of 100Sn, but also 3.72 meV??
 
   G4int Z = 99; // daughter nucleus charge, positive because it's beta+
@@ -239,7 +243,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   GunCount += 1;
   std::cout << "Event# " << GunCount << std::endl;
   //std::cout << "#" << "," <<  "Event" << "," << "plaque_nb" << "," << "energy(MeV)" << "," << "x(mm)" << "," << "y(mm)" << "," << "z(mm)" << "," << "px" << "," << "py" << "," << "pz" << "," << "n_x" << "," << "n_y" << "," << "n_z" << std::endl;
-  std::cout << "#" << "," << GunCount << "," << rdenergy << "," << nx+1 << "," << ny+1 << "," << nz+1 << std::endl;
+  std::cout << "#" << "," << GunCount << "," << rdenergy << "," << nx+1 << "," << ny+1 << "," << nz+1 << "," << EP << std::endl;
   
   // Setting particle gun
   fParticleGun->SetParticlePosition(G4ThreeVector(x,y,z));//(x,y,z));//

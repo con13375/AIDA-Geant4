@@ -146,7 +146,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   std::default_random_engine generator (seed);
   std::uniform_int_distribution<int> distrib(0, 5);
-  G4double plaque_nb = distrib(generator);//1;//
+  G4double plaque_nb = 1;//distrib(generator);//
   //std::cout << plaque_nb << std::endl;
 
   // randomize position x,y,z
@@ -164,13 +164,27 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   G4double Si_size = DDSD_XY_num; // mm
   G4double number_x = std::min(Si_size,std::max(-Si_size,num1));
   G4double number_y = std::min(Si_size,std::max(-Si_size,num2));
-
-  G4double x = number_x*mm;//Si_size*mm*(1-2*G4UniformRand());//r*std::cos(theta);//
-  G4double y = number_y*mm;//Si_size*mm*(1-2*G4UniformRand());//r*std::sin(theta);//
+  
+  G4double distribution_xy = std::floor(std::fmod(GunCount,15000)/5000); // 0 for gaussian, 1 for uniform, 2 for (0,0)
+  G4double x;
+  G4double y;
+  if(distribution_xy == 0){
+    x = number_x*mm;
+    y = number_y*mm;
+  }
+  if(distribution_xy == 1){
+    x = Si_size*mm*(1-2*G4UniformRand());//r*std::cos(theta);//
+    y = Si_size*mm*(1-2*G4UniformRand());//r*std::sin(theta);//
+  }
+  if(distribution_xy == 2){
+    x = 0;//
+    y = 0;//
+  }
   // uniform distribution in z within depth of detector from the chosen plaque
-  G4double first_pos = 0+AIDA_nose_Z-(1+0)*(separation+2*Plastic_Z)+Plastic_Z-DDSD_Z; // expression assembled from detectorConstruction first detector placement, taking Z = 0
-  G4double plaque_sep = separation+Plastic_Z, detector_Z = DDSD_Z;
-  G4double z = first_pos-plaque_nb*plaque_sep + (0.5-G4UniformRand())*detector_Z;
+  G4double plaque_sep = separation+2*Plastic_Z;
+  G4double first_pos = 0+AIDA_nose_Z-(1+0)*plaque_sep+Plastic_Z-DDSD_Z; // expression assembled from detectorConstruction first detector placement, taking Z = 0
+  G4double z = first_pos-plaque_nb*plaque_sep + (0.5-G4UniformRand())*DDSD_Z;
+  //std::cout << "z " << z << std::endl;
 
  	// This part transforms position to strip number (x,y), number of plaque (z)
   //G4double detector_XY = detector_XY_num*mm;
@@ -243,7 +257,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   GunCount += 1;
   std::cout << "Event# " << GunCount << std::endl;
   //std::cout << "#" << "," <<  "Event" << "," << "plaque_nb" << "," << "energy(MeV)" << "," << "x(mm)" << "," << "y(mm)" << "," << "z(mm)" << "," << "px" << "," << "py" << "," << "pz" << "," << "n_x" << "," << "n_y" << "," << "n_z" << std::endl;
-  std::cout << "#" << "," << GunCount << "," << rdenergy << "," << nx+1 << "," << ny+1 << "," << nz+1 << "," << EP << std::endl;
+  std::cout << "#" << "," << GunCount << "," << EP << "," << distribution_xy << "," << rdenergy << "," << nx+1 << "," << ny+1 << "," << nz+1 << std::endl;
   
   // Setting particle gun
   fParticleGun->SetParticlePosition(G4ThreeVector(x,y,z));//(x,y,z));//

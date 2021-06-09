@@ -45,7 +45,7 @@ constexpr G4double AIDA_nose_Z = 50*mm;
 // ~~~~~~~~~~~~~~~~ kapton stuff
 constexpr G4double kapton_Y = 0.1*mm;
 constexpr G4double cu_X = 0.15*mm, cu_Y = 0.009*mm, cu_sep = 0.635*mm;
-constexpr G4int n_cu = 4; // this should be 68, but i put it lower while building to ease loading time
+constexpr G4int n_cu = 68; // this should be 68, but i put it lower while building to ease loading time
 
 // ~~~~~~~~~~~~~~~~ tubes, separators and bolts
 constexpr G4double tube_in = 0.825*mm, tube_out = 1.5*mm, tube_Z = (AIDA_nose_Z + world_sizeZ)/2.0;

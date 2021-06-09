@@ -340,7 +340,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     G4double dZ = AIDA_nose_Z-(1+iplaque)*(separation+2*Plastic_Z);
     G4ThreeVector dZ_3V = G4ThreeVector(0,0,dZ);
     //std::cout << dZ << std::endl;
-    //std::cout << G4ThreeVector(0,0,Z+AIDA_nose_Z-(1+iplaque)*(separation+2*Plastic_Z)+Plastic_Z-DDSD_Z) << std::endl;
+    //std::cout << G4ThreeVector(0,0,Z)+dZ_3V+detector_spot << std::endl;
 
     //placing Si detector
     new G4PVPlacement(0,G4ThreeVector(0,0,Z)+dZ_3V+detector_spot,logic_DDSD,"DDSD",
@@ -487,7 +487,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   logic_plastic -> SetVisAttributes(plastic_color);
 
   // ~~~~~~~~~~~~~~~~ Print headers
-  std::cout << "#" << "," <<  "Event" << "," << "energy(MeV)" << "," << "n_x" << "," << "n_y" << "," << "n_z" <<  "," << "EndPointEnergy" << std::endl;
+  std::cout << "#" << "," <<  "Event" <<  "," << "EndPointEnergy" <<  "," << "xyDistributionType" << "," << "energy(MeV)" << "," << "n_x" << "," << "n_y" << "," << "n_z" << std::endl;
   std::cout << "##" << "," << "massOfParticle" << "," << "chargeOfParticle" << "," << "energyOfParticle(MeV)" << "," << "energyDeposited(MeV)" << "," //<< "x(mm)" << "," << "y(mm)" << "," << "z(mm)" << "," 
   << "n_x" << "," << "n_y" << "," << "n_z" << "," << "timeOfDecay(ns)" << "," << "timeAfterDecay(ns)" << "," <<  "ParticleName" << "," << "trackID" << "," << "ParentID" << "," << "CreatorProcess" << std::endl;
   std::cout << "###" << "," <<  "Event" << "," << "x(0)/y(1)" << "," << "energyDep_x" << "," << "n_x/n_y" << "," << "n_z" << "," << "zeroes" << std::endl;

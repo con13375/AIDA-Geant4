@@ -59,7 +59,7 @@ void EventAction::addEdep(G4double Edep, G4int N_z, G4int N_y, G4int N_x, G4doub
 {
 
   // beta+ energy: updates how much of the total energy in this pixel and in total is from a beta+ particle
-  if(std::abs(charge-1) < 0.1){
+  if(std::abs(charge+1) < 0.1){
     //std::cout << TED << std::endl;
     TotalBetaPercent = (TotalBetaPercent + Edep);//(TED+Edep);
     betaPercent[128*128*N_z + 128*N_x + N_y] = (betaPercent[128*128*N_z + 128*N_x + N_y] + Edep);

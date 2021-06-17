@@ -49,6 +49,7 @@
 #include "G4ParticleDefinition.hh"
 #include "G4ChargedGeantino.hh"
 #include "G4Positron.hh"
+#include "G4Electron.hh"
 #include "G4SystemOfUnits.hh"
 #include "Randomize.hh"
 
@@ -76,7 +77,8 @@ PrimaryGeneratorAction::PrimaryGeneratorAction()
 
 //  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* positron = G4Positron::PositronDefinition();
-  fParticleGun->SetParticleDefinition(positron);
+  G4ParticleDefinition* electron = G4Electron::ElectronDefinition();
+  fParticleGun->SetParticleDefinition(electron);
   fParticleGun->SetParticlePosition(G4ThreeVector(0.,0.,0.));
   fParticleGun->SetParticleEnergy(1*eV);    
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1.,0.,0.));
@@ -121,7 +123,7 @@ G4double FermiDistribution(G4int Z, G4double x, G4double EP){
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
 //#include "Parameters.icc"
-  G4ParticleDefinition* positron = G4Positron::PositronDefinition();
+  G4ParticleDefinition* electron = G4Electron::ElectronDefinition();
 
 //  G4ParticleDefinition* particle = fParticleGun->GetParticleDefinition();
 //  G4int Z = 50, A = 100;
@@ -131,7 +133,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 //  G4ParticleDefinition* geantino = particleTable->FindParticle("geantino");
   //G4ParticleDefinition* ion
   //   = G4IonTable::GetIonTable()->GetIon(Z,A,excitEnergy);
-  fParticleGun->SetParticleDefinition(positron);//ion);//(geantino);//
+  fParticleGun->SetParticleDefinition(electron);//ion);//(geantino);//
   //fParticleGun->SetParticleCharge(ionCharge);
 
   // randomized direction  
@@ -201,7 +203,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   G4double EP = 0.5+0.5*std::floor(GunCount/15000);// NNDC says 4.74;
   G4double end_point_energy = EP*MeV; // beta+ decay of 100Sn, but also 3.72 meV??
 
-  G4int Z = 99; // daughter nucleus charge, positive because it's beta+
+  G4int Z = -99; // daughter nucleus charge, positive because it's beta+
   G4double a_x;
 
 // I created this 'for' loop as a brute force way to generate numbers from a probability distribution

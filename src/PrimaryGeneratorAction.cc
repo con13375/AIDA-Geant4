@@ -78,7 +78,7 @@ PrimaryGeneratorAction::PrimaryGeneratorAction()
 //  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* positron = G4Positron::PositronDefinition();
   G4ParticleDefinition* electron = G4Electron::ElectronDefinition();
-  fParticleGun->SetParticleDefinition(electron);
+  fParticleGun->SetParticleDefinition(positron);
   fParticleGun->SetParticlePosition(G4ThreeVector(0.,0.,0.));
   fParticleGun->SetParticleEnergy(1*eV);    
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1.,0.,0.));
@@ -124,6 +124,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
 //#include "Parameters.icc"
   G4ParticleDefinition* electron = G4Electron::ElectronDefinition();
+  G4ParticleDefinition* positron = G4Positron::PositronDefinition();
 
 //  G4ParticleDefinition* particle = fParticleGun->GetParticleDefinition();
 //  G4int Z = 50, A = 100;
@@ -133,7 +134,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 //  G4ParticleDefinition* geantino = particleTable->FindParticle("geantino");
   //G4ParticleDefinition* ion
   //   = G4IonTable::GetIonTable()->GetIon(Z,A,excitEnergy);
-  fParticleGun->SetParticleDefinition(electron);//ion);//(geantino);//
+  fParticleGun->SetParticleDefinition(positron);//ion);//(geantino);//
   //fParticleGun->SetParticleCharge(ionCharge);
 
   // randomized direction  
@@ -148,7 +149,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   std::default_random_engine generator (seed);
   std::uniform_int_distribution<int> distrib(0, 5);
-  G4double plaque_nb = 1;//distrib(generator);//
+  G4double plaque_nb = distrib(generator);//1;//
   //std::cout << plaque_nb << std::endl;
 
   // randomize position x,y,z
@@ -203,7 +204,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   G4double EP = 0.5+0.5*std::floor(GunCount/15000);// NNDC says 4.74;
   G4double end_point_energy = EP*MeV; // beta+ decay of 100Sn, but also 3.72 meV??
 
-  G4int Z = -99; // daughter nucleus charge, positive because it's beta+
+  G4int Z = 99; // daughter nucleus charge, positive because it's beta+
   G4double a_x;
 
 // I created this 'for' loop as a brute force way to generate numbers from a probability distribution

@@ -368,7 +368,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
       G4Colour copper_brown(0.4, 0.15, 0.15);
       G4VisAttributes* copper_color = new G4VisAttributes(copper_brown);
-      logic_cu_strip -> SetVisAttributes(copper_color);
+      logic_cu_strip -> SetVisAttributes(G4VisAttributes::GetInvisible());
 
       // Now the placements of everything start with defining the qudrilateral symmetric position
       G4RotationMatrix rotm = G4RotationMatrix();
@@ -386,12 +386,12 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
       G4Transform3D transform_kapton = G4Transform3D(rotm,position_kapton);
 
       // Putting the Cu strips on kapton
-      for (G4int icu = 0; icu < n_cu; icu++) { // this is where the detector construction gets heavy, as the recursion goes up to n_cu = 68
-        G4ThreeVector position_cu = position_kapton+x*(kapton_Y+cu_Y)+y*(-0.5+n_cu*0.5-icu)*cu_sep;
-        G4Transform3D transform_cu = G4Transform3D(rotm,position_cu);
+      //for (G4int icu = 0; icu < n_cu; icu++) { // this is where the detector construction gets heavy, as the recursion goes up to n_cu = 68
+      //  G4ThreeVector position_cu = position_kapton+x*(kapton_Y+cu_Y)+y*(-0.5+n_cu*0.5-icu)*cu_sep;
+      //  G4Transform3D transform_cu = G4Transform3D(rotm,position_cu);
         //std::cout<<position_cu<<std::endl;
-        new G4PVPlacement(transform_cu, logic_cu_strip, "cu_strip", logicWorld, false, 4*n_cu*iplaque+n_cu*iconn+icu, fCheckOverlaps);
-      }
+        //new G4PVPlacement(transform_cu, logic_cu_strip, "cu_strip", logicWorld, false, 4*n_cu*iplaque+n_cu*iconn+icu, fCheckOverlaps);
+      //}
       
       // Putting 34 connector bits
       G4int n_bits = n_cu/2;
@@ -461,11 +461,16 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   logic_Mylar->SetVisAttributes( G4VisAttributes::GetInvisible() );
 
   // ~~~~~~~~~~~~~~~~ Colors
+
+  G4Colour copper_brown(0.4, 0.15, 0.15);
+  G4VisAttributes* copper_color = new G4VisAttributes(copper_brown);
+  logic_nut -> SetVisAttributes(G4VisAttributes::GetInvisible());
+
   G4Colour gray_black(0.2, 0.2, 0.2);
   G4VisAttributes* connector_color = new G4VisAttributes(gray_black);
   logic_connector -> SetVisAttributes(connector_color);
   logic_bit -> SetVisAttributes(connector_color);
-  logic_nut -> SetVisAttributes(connector_color);
+  logic_separator -> SetVisAttributes(connector_color);
 
   //  G4Colour gray_black(0.2, 0.2, 0.2);
   G4VisAttributes* tube_color = new G4VisAttributes(gray_black);
@@ -474,6 +479,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   G4Colour light_blue(0.7,0.7,1);
   G4VisAttributes* detector_color = new G4VisAttributes(light_blue);
   logic_DDSD -> SetVisAttributes(detector_color);
+  logic_bolt -> SetVisAttributes(detector_color);
 
   G4Colour bronze(141./256,108./256,41./256);
   G4VisAttributes* bronze_color = new G4VisAttributes(bronze);

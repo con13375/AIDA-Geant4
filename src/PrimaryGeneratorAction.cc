@@ -168,7 +168,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   G4double number_x = std::min(Si_size,std::max(-Si_size,num1));
   G4double number_y = std::min(Si_size,std::max(-Si_size,num2));
   
-  G4double distribution_xy = std::floor(std::fmod(GunCount,15000)/5000); // 0 for gaussian, 1 for uniform, 2 for (0,0)
+  G4double distribution_xy = 1;//std::floor(std::fmod(GunCount,15000)/5000); // 0 for gaussian, 1 for uniform, 2 for (0,0)
   G4double x;
   G4double y;
   if(distribution_xy == 0){
@@ -201,10 +201,10 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   // energy distribution part
 //  G4double rdenergy = 0; //setting the ion at rest now
 
-  G4double EP = 0.5+0.5*std::floor(GunCount/15000);// NNDC says 4.74;
+  G4double EP = 4.0;//0.5+0.5*std::floor(GunCount/15000);// NNDC says 4.74;
   G4double end_point_energy = EP*MeV; // beta+ decay of 100Sn, but also 3.72 meV??
 
-  G4int Z = 99; // daughter nucleus charge, positive because it's beta+
+  G4int Z = 49; // daughter nucleus charge, positive because it's beta+
   G4double a_x;
 
 // I created this 'for' loop as a brute force way to generate numbers from a probability distribution
